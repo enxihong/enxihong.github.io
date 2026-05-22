@@ -553,7 +553,7 @@ const fishy=(()=>{
       if(dist<player.r*0.85+f.r*0.85){
         if(player.r>=f.r*0.85){
           // eat it
-          player.r+=f.r*0.18;
+          player.r+=f.r*0.05;
           score++;
           scoreEl.textContent=score;
           const prev=parseInt(localStorage.getItem('fishy-best')||0);
