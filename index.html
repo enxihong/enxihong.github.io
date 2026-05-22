@@ -791,6 +791,20 @@ const breakout = (() => {
     };
   }
 
+  function launchBalls(){
+    if(launched) return;
+    launched=true;
+    const spd=3.5+(level-1)*0.6;
+    balls.forEach(b=>{
+      if(!b.launched){
+        const angle=(Math.random()-0.5)*1.0;
+        b.vx=Math.sin(angle)*spd;
+        b.vy=-Math.cos(angle)*spd;
+        b.launched=true;
+      }
+    });
+  }
+
   function updateScore(pts){
     score+=pts; scoreEl.textContent=score;
     const prev=parseInt(localStorage.getItem('breakout-best')||0);
@@ -1026,7 +1040,7 @@ const breakout = (() => {
   document.addEventListener('keydown',e=>{
     if(activeGame!=='breakout')return;
     if((e.key===' '||e.key==='Enter')&&!overlay.classList.contains('hidden')){start();return;}
-    if(e.key===' '&&running){e.preventDefault();launched=true;balls.forEach(b=>b.launched=true);}
+    if(e.key===' '&&running){e.preventDefault();launchBalls();}
     if(e.key==='ArrowLeft'||e.key==='a')  paddleTarget=Math.max(0,paddleTarget-30);
     if(e.key==='ArrowRight'||e.key==='d') paddleTarget=Math.min(W,paddleTarget+30);
   });
@@ -1037,14 +1051,14 @@ const breakout = (() => {
   });
   canvas.addEventListener('click',e=>{
     if(activeGame!=='breakout'||!overlay.classList.contains('hidden'))return;
-    launched=true;balls.forEach(b=>b.launched=true);
+    launchBalls();
   });
   canvas.addEventListener('touchstart',e=>{
     if(activeGame!=='breakout')return;
     e.preventDefault();
     paddleTarget=e.touches[0].clientX-canvas.getBoundingClientRect().left;
     if(!overlay.classList.contains('hidden'))return;
-    launched=true;balls.forEach(b=>b.launched=true);
+    launchBalls();
   },{passive:false});
   canvas.addEventListener('touchmove',e=>{
     if(activeGame!=='breakout')return;e.preventDefault();
