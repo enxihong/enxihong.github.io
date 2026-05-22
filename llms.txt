@@ -1,0 +1,23 @@
+# Enxi Hong
+
+> Personal website of Enxi Hong — I like building things and being creative.
+
+## About
+
+Enxi Hong's personal website at enxihong.github.io. Built entirely with HTML, CSS, and JavaScript. Hosted on GitHub Pages. Created with Claude Code from a phone while traveling.
+
+## Games
+
+The site features a collection of browser-based games playable on desktop and mobile:
+
+- **Snake**: Classic snake game. Eat food to grow, avoid hitting yourself. Swipe controls on mobile.
+- **Tetris**: Block stacking game with ghost piece, scoring, and increasing speed per level.
+- **Fishy**: Eat smaller fish to grow, avoid bigger fish. Mouse or touch to move.
+- **Breakout**: Paddle and ball game. Break bricks, catch power-ups, avoid bombs.
+  - Power-ups: wide paddle, fast ball, slow ball, multi-ball, extra life, star (+50 pts)
+  - Bombs: instant game over if caught
+
+## Links
+
+- [Website](https://enxihong.github.io/)
+- [GitHub](https://github.com/enxihong)
