@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Enxi Hong</title>
   <style>
     *, *::before, *::after {
@@ -13,25 +13,400 @@
 
     html, body {
       height: 100%;
+      overflow: hidden;
     }
 
     body {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       background: #fff;
       color: #111;
+      gap: 16px;
     }
 
     h1 {
-      font-size: clamp(2rem, 6vw, 4rem);
+      font-size: clamp(1.5rem, 5vw, 3rem);
       font-weight: 500;
       letter-spacing: -0.02em;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.3s;
+    }
+
+    h1:hover {
+      opacity: 0.5;
+    }
+
+    #hint {
+      font-size: 0.8rem;
+      color: #999;
+      letter-spacing: 0.05em;
+      transition: opacity 0.5s;
+    }
+
+    #game-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #score-line {
+      display: flex;
+      gap: 32px;
+      font-size: 0.85rem;
+      color: #555;
+      letter-spacing: 0.05em;
+    }
+
+    #score-line span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    #score-line .label {
+      font-size: 0.65rem;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+
+    canvas {
+      border: 1.5px solid #111;
+      display: block;
+      touch-action: none;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.92);
+      pointer-events: none;
+    }
+
+    #overlay.hidden {
+      display: none;
+    }
+
+    #overlay h2 {
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    #overlay p {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    #canvas-wrapper {
+      position: relative;
+    }
+
+    #mobile-controls {
+      display: none;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(2, 44px);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    #mobile-controls button {
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    #mobile-controls button:active {
+      background: #444;
+    }
+
+    #btn-up    { grid-column: 2; grid-row: 1; }
+    #btn-left  { grid-column: 1; grid-row: 2; }
+    #btn-down  { grid-column: 2; grid-row: 2; }
+    #btn-right { grid-column: 3; grid-row: 2; }
+
+    @media (pointer: coarse) {
+      #mobile-controls {
+        display: grid;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Enxi Hong</h1>
+
+  <div id="start-screen">
+    <h1 id="name">Enxi Hong</h1>
+    <p id="hint">click to play snake</p>
+  </div>
+
+  <div id="game-container">
+    <div id="score-line">
+      <span><span class="label">Score</span><span id="score">0</span></span>
+      <span><span class="label">Best</span><span id="best">0</span></span>
+    </div>
+    <div id="canvas-wrapper">
+      <canvas id="canvas"></canvas>
+      <div id="overlay">
+        <h2 id="overlay-title">Ready?</h2>
+        <p id="overlay-sub">Press Space or tap to start</p>
+      </div>
+    </div>
+    <div id="mobile-controls">
+      <button id="btn-up">↑</button>
+      <button id="btn-left">←</button>
+      <button id="btn-down">↓</button>
+      <button id="btn-right">→</button>
+    </div>
+  </div>
+
+<script>
+const CELL = 20;
+const COLS = 20;
+const ROWS = 20;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const overlay = document.getElementById('overlay');
+const overlayTitle = document.getElementById('overlay-title');
+const overlaySub = document.getElementById('overlay-sub');
+const scoreEl = document.getElementById('score');
+const bestEl = document.getElementById('best');
+const startScreen = document.getElementById('start-screen');
+const gameContainer = document.getElementById('game-container');
+
+function resize() {
+  const maxW = Math.min(window.innerWidth - 32, 480);
+  const maxH = window.innerHeight - 160;
+  const size = Math.min(maxW, maxH);
+  const cellSize = Math.floor(size / COLS) || CELL;
+  canvas.width = cellSize * COLS;
+  canvas.height = cellSize * ROWS;
+  canvas.dataset.cell = cellSize;
+  if (state) draw();
+}
+
+let state = null;
+let loop = null;
+let best = parseInt(localStorage.getItem('snake-best') || '0');
+bestEl.textContent = best;
+
+function cellSize() {
+  return parseInt(canvas.dataset.cell) || CELL;
+}
+
+function newState() {
+  return {
+    snake: [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}],
+    dir: {x: 1, y: 0},
+    next: {x: 1, y: 0},
+    food: spawnFood([{x:10,y:10},{x:9,y:10},{x:8,y:10}]),
+    score: 0,
+    running: false,
+    dead: false,
+  };
+}
+
+function spawnFood(snake) {
+  let pos;
+  do {
+    pos = {x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS)};
+  } while (snake.some(s => s.x===pos.x && s.y===pos.y));
+  return pos;
+}
+
+function tick() {
+  if (!state.running) return;
+  state.dir = state.next;
+  const head = {
+    x: (state.snake[0].x + state.dir.x + COLS) % COLS,
+    y: (state.snake[0].y + state.dir.y + ROWS) % ROWS,
+  };
+  if (state.snake.some(s => s.x===head.x && s.y===head.y)) {
+    die(); return;
+  }
+  state.snake.unshift(head);
+  if (head.x===state.food.x && head.y===state.food.y) {
+    state.score++;
+    scoreEl.textContent = state.score;
+    if (state.score > best) {
+      best = state.score;
+      bestEl.textContent = best;
+      localStorage.setItem('snake-best', best);
+    }
+    state.food = spawnFood(state.snake);
+  } else {
+    state.snake.pop();
+  }
+  draw();
+}
+
+function die() {
+  state.running = false;
+  state.dead = true;
+  clearInterval(loop);
+  overlayTitle.textContent = 'Game Over';
+  overlaySub.textContent = `Score: ${state.score} — tap to restart`;
+  overlay.classList.remove('hidden');
+  shakeCanvas();
+}
+
+function shakeCanvas() {
+  canvas.style.transition = 'transform 0.05s';
+  let i = 0;
+  const id = setInterval(() => {
+    const d = 4 * (1 - i/8);
+    canvas.style.transform = i % 2 === 0 ? `translateX(${d}px)` : `translateX(-${d}px)`;
+    if (++i > 8) { clearInterval(id); canvas.style.transform = ''; }
+  }, 50);
+}
+
+function draw() {
+  const C = cellSize();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // food
+  ctx.fillStyle = '#e74c3c';
+  ctx.beginPath();
+  ctx.arc(
+    state.food.x * C + C/2,
+    state.food.y * C + C/2,
+    C/2 - 2, 0, Math.PI*2
+  );
+  ctx.fill();
+
+  // snake
+  state.snake.forEach((seg, i) => {
+    const ratio = 1 - i / state.snake.length;
+    const gray = Math.round(100 + ratio * 100);
+    ctx.fillStyle = i === 0 ? '#111' : `rgb(${gray},${gray},${gray})`;
+    const pad = i === 0 ? 1 : 2;
+    const r = i === 0 ? 4 : 3;
+    roundRect(ctx, seg.x*C+pad, seg.y*C+pad, C-pad*2, C-pad*2, r);
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.arcTo(x+w, y, x+w, y+r, r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h);
+  ctx.arcTo(x, y+h, x, y+h-r, r);
+  ctx.lineTo(x, y+r);
+  ctx.arcTo(x, y, x+r, y, r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function startGame() {
+  if (state && state.running) return;
+  state = newState();
+  state.running = true;
+  scoreEl.textContent = 0;
+  overlay.classList.add('hidden');
+  clearInterval(loop);
+  loop = setInterval(tick, 120);
+  draw();
+}
+
+// keyboard
+document.addEventListener('keydown', e => {
+  if (!gameContainer.style.display || gameContainer.style.display === 'none') return;
+  const map = {
+    ArrowUp:    {x:0,y:-1}, w: {x:0,y:-1},
+    ArrowDown:  {x:0,y:1},  s: {x:0,y:1},
+    ArrowLeft:  {x:-1,y:0}, a: {x:-1,y:0},
+    ArrowRight: {x:1,y:0},  d: {x:1,y:0},
+  };
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    startGame();
+    return;
+  }
+  const d = map[e.key];
+  if (!d) return;
+  e.preventDefault();
+  if (state && !(d.x === -state.dir.x && d.y === -state.dir.y)) {
+    state.next = d;
+  }
+});
+
+// mobile buttons
+function setDir(d) {
+  if (state && state.running && !(d.x === -state.dir.x && d.y === -state.dir.y)) {
+    state.next = d;
+  } else if (!state || !state.running) {
+    startGame();
+  }
+}
+document.getElementById('btn-up').addEventListener('click',    () => setDir({x:0,y:-1}));
+document.getElementById('btn-down').addEventListener('click',  () => setDir({x:0,y:1}));
+document.getElementById('btn-left').addEventListener('click',  () => setDir({x:-1,y:0}));
+document.getElementById('btn-right').addEventListener('click', () => setDir({x:1,y:0}));
+
+// swipe
+let touchStart = null;
+canvas.addEventListener('touchstart', e => {
+  touchStart = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+}, {passive: true});
+canvas.addEventListener('touchend', e => {
+  if (!touchStart) return;
+  const dx = e.changedTouches[0].clientX - touchStart.x;
+  const dy = e.changedTouches[0].clientY - touchStart.y;
+  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+    startGame(); return;
+  }
+  let d;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    d = dx > 0 ? {x:1,y:0} : {x:-1,y:0};
+  } else {
+    d = dy > 0 ? {x:0,y:1} : {x:0,y:-1};
+  }
+  if (state && state.running && !(d.x === -state.dir.x && d.y === -state.dir.y)) {
+    state.next = d;
+  } else {
+    startGame();
+  }
+  touchStart = null;
+}, {passive: true});
+
+// click overlay / canvas
+overlay.addEventListener('click', startGame);
+overlay.style.pointerEvents = 'all';
+
+// start screen click
+document.getElementById('name').addEventListener('click', () => {
+  startScreen.style.display = 'none';
+  gameContainer.style.display = 'flex';
+  resize();
+  state = newState();
+  draw();
+  overlayTitle.textContent = 'Snake';
+  overlaySub.textContent = 'Space / tap / swipe to start';
+  overlay.classList.remove('hidden');
+});
+
+window.addEventListener('resize', resize);
+resize();
+</script>
 </body>
 </html>
