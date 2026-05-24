@@ -71,7 +71,11 @@ const pacman=(()=>{
   }
 
   function canMove(gx,gy,dx,dy){
-    const nx=Math.round(gx+dx), ny=Math.round(gy+dy);
+    // Use floor/ceil based on direction so we check from the cell we're in,
+    // not the rounded-toward-destination cell (which can skip over walls).
+    const cx=dx>0?Math.floor(gx):dx<0?Math.ceil(gx):Math.round(gx);
+    const cy=dy>0?Math.floor(gy):dy<0?Math.ceil(gy):Math.round(gy);
+    const nx=cx+dx, ny=cy+dy;
     if(nx<0||nx>=COLS) return true; // wrap
     if(ny<0||ny>=ROWS) return false;
     const cell=maze[ny]?.[nx];
@@ -189,9 +193,11 @@ const pacman=(()=>{
 
     // pac-man movement
     const spd=0.12+(level-1)*0.01;
-    const rx=Math.abs(pm.x-Math.round(pm.x)), ry=Math.abs(pm.y-Math.round(pm.y));
-    if(rx<0.08&&ry<0.08){
-      pm.x=Math.round(pm.x); pm.y=Math.round(pm.y);
+    const nearX=Math.round(pm.x), nearY=Math.round(pm.y);
+    const rx=Math.abs(pm.x-nearX), ry=Math.abs(pm.y-nearY);
+    const nearOpen=maze[nearY]?.[nearX]!==1&&maze[nearY]?.[nearX]!==4;
+    if(rx<0.08&&ry<0.08&&nearOpen){
+      pm.x=nearX; pm.y=nearY;
       if(canMove(pm.x,pm.y,nextDir.x,nextDir.y)){pm.dir=nextDir;}
     }
     if(canMove(pm.x,pm.y,pm.dir.x,pm.dir.y)){
@@ -199,7 +205,14 @@ const pacman=(()=>{
       pm.x=((pm.x%COLS)+COLS)%COLS;
       pm.y=Math.max(0,Math.min(ROWS-1,pm.y));
       pm.moving=true;
-    } else { pm.moving=false; }
+    } else {
+      // Snap back to last open cell center so the snap check can fire next tick
+      if(pm.dir.x>0) pm.x=Math.floor(pm.x);
+      else if(pm.dir.x<0) pm.x=Math.ceil(pm.x);
+      if(pm.dir.y>0) pm.y=Math.floor(pm.y);
+      else if(pm.dir.y<0) pm.y=Math.ceil(pm.y);
+      pm.moving=false;
+    }
 
     // eat dots
     const tx=Math.round(pm.x), ty=Math.round(pm.y);
