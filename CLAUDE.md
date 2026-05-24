@@ -44,6 +44,10 @@ These are used by all game files:
 
 `snake-best`, `tetris-best`, `fishy-best`, `breakout-best`, `pacman-best`
 
+## Git-Workflow
+
+- Feature-Branches dürfen ohne Rückfrage in main gemergt und gepusht werden.
+
 ## How to test locally
 
 ```bash
