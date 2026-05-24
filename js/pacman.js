@@ -151,8 +151,8 @@ const pacman=(()=>{
       return;
     }
 
-    const spd=g.state==='frightened'?0.06:0.09+(level-1)*0.004;
-    const snap=0.15;
+    const spd=g.state==='frightened'?0.09:0.10+(level-1)*0.004;
+    const snap=0.08;
     const rx=Math.abs(g.x-Math.round(g.x)), ry=Math.abs(g.y-Math.round(g.y));
 
     // only choose new dir at grid intersections
@@ -190,7 +190,7 @@ const pacman=(()=>{
     // pac-man movement
     const spd=0.12+(level-1)*0.01;
     const rx=Math.abs(pm.x-Math.round(pm.x)), ry=Math.abs(pm.y-Math.round(pm.y));
-    if(rx<0.15&&ry<0.15){
+    if(rx<0.08&&ry<0.08){
       pm.x=Math.round(pm.x); pm.y=Math.round(pm.y);
       if(canMove(pm.x,pm.y,nextDir.x,nextDir.y)){pm.dir=nextDir;}
     }
