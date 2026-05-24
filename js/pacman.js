@@ -33,6 +33,7 @@ const pacman=(()=>{
   const GHOST_NAMES=['blinky','pinky','inky','clyde'];
   // Ghost house center
   const HOUSE_X=10, HOUSE_Y=10;
+  const HOUSE_EXIT_Y=7; // open corridor above ghost house, reachable from main maze
   const SPAWN_X=10, SPAWN_Y=16; // pac-man start
 
   let tile, maze, pm, ghosts, score, lives, level, running, raf, frightTimer, ghostEatCombo;
@@ -140,18 +141,22 @@ const pacman=(()=>{
     // release from house
     if(g.state==='house'){
       g.releaseTimer--;
-      if(g.releaseTimer<=0){g.state='chase';g.x=HOUSE_X;g.y=HOUSE_Y-1;}
+      if(g.releaseTimer<=0){g.state='chase';g.x=HOUSE_X;g.y=HOUSE_EXIT_Y;}
       return;
     }
     if(g.state==='eyes'){
-      // return to house
-      const step=bfsStep(g.x,g.y,HOUSE_X,HOUSE_Y,g.dir);
+      // return to the exit corridor above the house
+      const step=bfsStep(g.x,g.y,HOUSE_X,HOUSE_EXIT_Y,g.dir);
       g.dir=step;
       g.x+=g.dir.x*0.12;
       g.y+=g.dir.y*0.12;
       g.x=wrapX(g.x);
-      const dx=Math.abs(g.x-HOUSE_X), dy=Math.abs(g.y-HOUSE_Y);
-      if(dx<0.2&&dy<0.2){g.x=HOUSE_X;g.y=HOUSE_Y;g.state='house';g.releaseTimer=120;}
+      const dx=Math.abs(g.x-HOUSE_X), dy=Math.abs(g.y-HOUSE_EXIT_Y);
+      if(dx<0.2&&dy<0.2){
+        // reset to house interior position so ghost appears inside house while waiting
+        g.x=HOUSE_X+(i-1.5)*0.5; g.y=HOUSE_Y;
+        g.state='house'; g.releaseTimer=120;
+      }
       return;
     }
 
