@@ -514,10 +514,64 @@ Die **Lastpfadanalyse** geht einen Schritt weiter: Sie untersucht, welche Konseq
 Im Fahrzeug- und Luftfahrtbereich ist diese Analyse sicherheitskritisch: Ein falsch dimensionierter Splice, der mehrere Verbraucher versorgt, kann bei Überlast thermisch versagen und kaskadenartige Ausfälle auslösen – genau wie Luisas fehlender Oboist, der über mehrere Zwischenglieder das gesamte Orchester destabilisierte.
 
 Das Ziel guten Harness Engineerings ist deshalb: **Topologien entwerfen, die robust gegenüber Einzelausfällen sind** – durch bewusste Pfadplanung, Schutzschalterkoordination und durchdachte Redundanzarchitektur.`
+    },
+    russell: {
+      title: "Russells Paradoxon",
+      md: `## Die Hüterin der Grenzen
+
+In einer Stadt lebte eine Frau namens Vera, die als Archivarin arbeitete. Ihr Archiv war kein gewöhnliches — es enthielt keine Bücher, sondern **Mengen**: Körbe voller Dinge, Schachteln in Schachteln, Zimmer voller Zimmer.
+
+Eines Morgens brachte ihr ein junger Mann einen Korb und sagte: „Vera, ich habe alle Körbe der Stadt gesammelt — jeden einzelnen, der sich *nicht selbst enthält*."
+
+Vera betrachtete den Korb. Er war leer, aber das störte sie nicht. Seltsam war etwas anderes.
+
+„Enthält dein Korb sich selbst?", fragte sie ruhig.
+
+Der junge Mann lachte. „Natürlich nicht. Also gehört er zu den Körben, die sich nicht selbst enthalten — und deshalb *ist* er ja auch darin."
+
+Vera schwieg.
+
+„Aber warte", fuhr er fort, langsamer jetzt. „Wenn er *in sich selbst* ist… dann enthält er sich selbst. Und dann dürfte er gar nicht darin sein. Dann müsste er *heraus*." Er griff in den Korb, zog ihn heraus — und hielt ihn in der Hand. „Aber jetzt enthält er sich wieder nicht, also *muss* er hinein."
+
+Er legte ihn wieder hinein.
+
+Heraus. Hinein. Heraus. Hinein.
+
+Der junge Mann sah Vera an. Sie lächelte nicht, aber ihre Augen waren wach.
+
+„Was ist das?", flüsterte er.
+
+„Ein Widerspruch", sagte sie. „Aber kein gewöhnlicher. Dein Korb ist nicht falsch gebaut — die *Frage* ist falsch gestellt. Du hast eine Menge erschaffen, die sich selbst definieren soll, ob sie sich enthält. Und das kann sie nicht. Sie zerfällt in dem Moment, in dem sie es versucht."
+
+Der junge Mann setzte sich. Lange sagte er nichts.
+
+„Dann kann man nicht einfach *alle* Mengen sammeln?"
+
+„Nein", antwortete Vera. „Manche Sammlungen darf man nicht bilden. Nicht weil es verboten ist — sondern weil die Logik selbst zusammenbricht."
+
+---
+
+## Das Konzept: Russells Paradoxon
+
+**Bertrand Russell** entdeckte 1901 einen fundamentalen Widerspruch in der naiven Mengenlehre.
+
+Die **naive Mengenlehre** erlaubte jede beliebige Eigenschaft, um eine Menge zu definieren — also auch: *„Die Menge aller Mengen, die sich nicht selbst enthalten"*, formal: **R = { x | x ∉ x }**.
+
+Die Frage lautet dann: Gilt R ∈ R?
+
+- Wenn **R ∈ R**, dann erfüllt R die definierende Eigenschaft nicht — also müsste R ∉ R gelten. Widerspruch.
+- Wenn **R ∉ R**, dann erfüllt R die Eigenschaft — also müsste R ∈ R gelten. Widerspruch.
+
+Das Paradoxon zeigte, dass die naive Mengenlehre (Freges System) in sich **inkonsistent** ist. Es war kein Randproblem — es traf das Fundament der Mathematik.
+
+Die Reaktion war tiefgreifend: Ernst Zermelo und Abraham Fraenkel entwickelten die **axiomatische Mengenlehre (ZF/ZFC)**, die das unkontrollierte Bilden von Mengen einschränkt. Das **Aussonderungsaxiom** erlaubt nur noch, Teilmengen aus bereits existierenden Mengen auszusondern — eine „Menge aller Mengen" darf gar nicht erst entstehen.
+
+Russells Paradoxon markiert damit den Übergang von der intuitiven zur streng axiomatischen Mathematik — eine der wichtigsten Zäsuren des 20. Jahrhunderts.`
     }
   };
 
   const topicLabels = {
+    russell: "Russells Paradoxon",
     rdd: "Regression Discontinuity Design",
     iv: "Instrumental Variable",
     harness: "Agentenevaluation",
