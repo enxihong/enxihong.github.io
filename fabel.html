@@ -567,11 +567,77 @@ Das Paradoxon zeigte, dass die naive Mengenlehre (Freges System) in sich **inkon
 Die Reaktion war tiefgreifend: Ernst Zermelo und Abraham Fraenkel entwickelten die **axiomatische Mengenlehre (ZF/ZFC)**, die das unkontrollierte Bilden von Mengen einschränkt. Das **Aussonderungsaxiom** erlaubt nur noch, Teilmengen aus bereits existierenden Mengen auszusondern — eine „Menge aller Mengen" darf gar nicht erst entstehen.
 
 Russells Paradoxon markiert damit den Übergang von der intuitiven zur streng axiomatischen Mathematik — eine der wichtigsten Zäsuren des 20. Jahrhunderts.`
+    },
+    turing: {
+      title: "Unentscheidbarkeit",
+      md: `## Der Mann, der nie aufhört zu fragen
+
+Der Philosoph Kael hatte eine Eigenheit: Er beantwortete keine Frage direkt. Stattdessen verwandelte er jede Frage in eine andere — präziser, schärfer, tiefer.
+
+Eines Tages kam eine Studentin zu ihm. „Kael", sagte sie, „ich habe ein Problem, das ich nicht lösen kann."
+
+„Gut", sagte er. „Beschreib es mir."
+
+Sie erklärte es. Kael hörte zu, nickte — und formulierte ein neues, einfacheres Problem. „Kannst du *das* lösen?"
+
+Sie dachte nach. „Ja."
+
+„Dann hast du auch deins gelöst", sagte er. „Denn deins ist im Grunde dasselbe."
+
+Die Studentin war beeindruckt. Wochen vergingen. Sie kam mit schwereren Problemen. Kael verwandelte sie immer — in bekannte Formen, in gelöste Fälle, in Fragen, auf die die Antwort bereits irgendwo stand.
+
+Dann, eines Abends, kam sie mit einem anderen Gesicht. Nicht fragend — triumphierend.
+
+„Kael. Ich habe *dein* Problem."
+
+Er sah auf.
+
+„Ich frage dich: Wirst du diese Frage jemals beantworten?" Sie lächelte. „Wenn ja — beantworte sie jetzt. Wenn nein — dann hast du sie gerade beantwortet. Du kannst nicht entkommen."
+
+Kael lehnte sich zurück.
+
+„Darf ich sie umformulieren?"
+
+„Natürlich. Das ist deine Methode."
+
+Er dachte lange nach. Dann sagte er leise: „Ich kann deine Frage nicht in eine einfachere verwandeln. Nicht weil sie zu schwer ist — sondern weil sie sich selbst im Weg steht. Jede Umformulierung führt zurück zu ihr. Sie hat keinen Boden."
+
+Die Studentin setzte sich. Die Stille zwischen ihnen war anders als sonst.
+
+„Es gibt also Fragen", sagte sie langsam, „die deine Methode nicht lösen kann — nicht einmal prinzipiell?"
+
+„Ja", sagte Kael. „Und das Merkwürdige ist: Ich kann dir sogar *beweisen*, dass es sie gibt. Ich kann dir nur nicht sagen, welche es sind — bevor du sie mir bringst."
+
+Er sah aus dem Fenster.
+
+„Manche Probleme erkennt man erst als unlösbar, wenn man zu lange vor ihnen steht."
+
+---
+
+## Das Konzept: Unentscheidbarkeit und das Halteproblem (Turing, 1936)
+
+**Alan Turing** zeigte 1936, dass es fundamentale Grenzen der Berechenbarkeit gibt — Probleme, die kein Algorithmus jemals lösen kann, egal wie leistungsfähig der Computer ist.
+
+Das bekannteste Beispiel ist das **Halteproblem**: Gegeben ein beliebiges Programm P und eine Eingabe E — wird P bei Eingabe E irgendwann *anhalten*, oder läuft es ewig?
+
+Turings Beweis ist ein **Diagonalargument** — elegant und vernichtend:
+
+Angenommen, es gäbe ein Programm H(P, E), das für jedes P und E korrekt entscheidet: *„hält"* oder *„hält nicht"*. Dann konstruiert man ein neues Programm D, das H als Unterprogramm benutzt und sich selbst als Eingabe übergibt:
+
+- Wenn H sagt, D würde halten → dann läuft D absichtlich ewig.
+- Wenn H sagt, D würde nicht halten → dann hält D sofort an.
+
+Was passiert, wenn man D mit sich selbst aufruft? H kann keine konsistente Antwort liefern — ein direkter Widerspruch. Also kann H nicht existieren.
+
+Das Halteproblem ist damit **unentscheidbar** — nicht nur schwer, sondern prinzipiell außerhalb jeder algorithmischen Reichweite.
+
+Die Konsequenzen sind tiefgreifend: Compiler können nicht allgemein prüfen, ob Code terminiert. Viren können nicht vollständig automatisch erkannt werden. Softwareverifikation hat unüberwindbare Grenzen. Turings Ergebnis definiert nicht, was Computer *heute* nicht können — sondern was sie **niemals** können werden.`
     }
   };
 
   const topicLabels = {
     russell: "Russells Paradoxon",
+    turing: "Unentscheidbarkeit",
     rdd: "Regression Discontinuity Design",
     iv: "Instrumental Variable",
     harness: "Agentenevaluation",
