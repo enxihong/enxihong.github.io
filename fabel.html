@@ -768,11 +768,70 @@ Genau das formuliert Richterin Sorel: Ein p-Wert von 0,02 bedeutet nicht „99 %
 Ergänzend sprechen Statistiker von **Signifikanzniveau α** (dem vorab festgelegten Schwellenwert), **Teststärke** (Power: Wahrscheinlichkeit, H₀ zu verwerfen, wenn H₁ wahr ist) und **Fehlerarten**: Typ-I-Fehler (H₀ fälschlicherweise verworfen) und Typ-II-Fehler (H₁ fälschlicherweise übersehen).
 
 Das Hypothesentesten ist damit kein Wahrheitsdetektor — sondern ein präzises Instrument zur **Kontrolle von Irrtümern**: Es legt fest, wie oft wir bereit sind, uns zu täuschen, bevor wir handeln.`
+    },
+    cantor: {
+      title: "Cantors Diagonalargument",
+      md: `## Die Frau, die Städte zählte
+
+Leila reiste. Nicht zum Vergnügen — sie suchte etwas, das sie nicht benennen konnte.
+
+Sie begann in einer kleinen Stadt am Meer. Dort lebten Menschen, die Zahlen liebten: ganze Zahlen, saubere Brüche, Verhältnisse. Alles war messbar, alles hatte einen Platz auf dem Zahlenstrahl. Leila fühlte sich wohl. Sie blieb eine Weile.
+
+Dann hörte sie von einer anderen Stadt — größer, weiter im Landesinneren. Dort gab es mehr: nicht nur Brüche, sondern auch Zahlen, die sich nicht als Verhältnis schreiben ließen. Wurzeln. Irrationale Werte. Die Stadt war voller als die erste, unendlich dichter — und trotzdem, versicherten ihr die Einwohner, war sie *abzählbar*. Man konnte jeden Bürger theoretisch in eine Reihe bringen, einen nach dem anderen durchnummerieren, bis in alle Ewigkeit.
+
+Leila reiste weiter.
+
+Die dritte Stadt hatte keinen Namen. Sie lag nicht auf einer Karte. Und als Leila ankam, verstand sie sofort, dass hier etwas anders war.
+
+Die Einwohner — alle reellen Zahlen zwischen null und eins, nur dieser winzige Ausschnitt — saßen nicht in Reihen. Sie standen überall gleichzeitig, dicht an dicht, ohne Anfang, ohne Abstand, ohne die Möglichkeit, auch nur einen von ihnen als *ersten* zu benennen.
+
+„Ich kann euch trotzdem zählen", sagte Leila. „Gebt mir Zeit."
+
+Ein alter Mann schüttelte den Kopf. „Das haben viele versucht. Zeig mir deine Liste — ich zeige dir, wen du vergessen hast."
+
+Leila schrieb. Eine unendlich lange Liste, so sorgfältig sie konnte. Der alte Mann sah kurz hin — und nannte eine Zahl, die nicht darin vorkam. Sie erweiterte die Liste. Er nannte eine weitere. Egal wie weit sie schrieb — er war schneller. Nicht weil er klüger war, sondern weil er eine Methode hatte: Er las die Diagonale ihrer Liste und veränderte jede Stelle. Das Ergebnis war immer jemand, den sie vergessen hatte.
+
+„Ihr seid zu viele", sagte Leila schließlich.
+
+„Nein", sagte der Mann. „Wir sind eine andere Art von unendlich."
+
+---
+
+## Das Konzept: Cantors Diagonalargument und überabzählbare Mengen
+
+**Georg Cantor** zeigte Ende des 19. Jahrhunderts, dass nicht alle Unendlichkeiten gleich groß sind — eine der radikalsten Entdeckungen der Mathematik.
+
+Zwei Mengen haben dieselbe **Mächtigkeit**, wenn man ihre Elemente umkehrbar eindeutig einander zuordnen kann — eine sogenannte **Bijektion**. Die natürlichen Zahlen ℕ, die ganzen Zahlen ℤ und sogar die rationalen Zahlen ℚ sind alle gleich mächtig: **abzählbar unendlich** (Mächtigkeit ℵ₀). Man kann ihre Elemente in eine geordnete Folge bringen.
+
+Cantor bewies jedoch, dass die reellen Zahlen ℝ — selbst nur das Intervall (0, 1) — **nicht** abzählbar sind. Der Beweis ist das **Diagonalargument**:
+
+Angenommen, es gäbe eine vollständige Liste aller reellen Zahlen in (0, 1):
+
+\`\`\`
+r₁ = 0. [4] 1 7 2 0 ...
+r₂ = 0. 5 [8] 3 1 4 ...
+r₃ = 0. 2 0 [0] 6 1 ...
+r₄ = 0. 9 3 7 [3] 8 ...
+...
+\`\`\`
+
+Man konstruiert eine neue Zahl d, indem man die **Diagonalstellen** nimmt — die n-te Nachkommastelle der n-ten Zahl — und jede Ziffer verändert (z. B. +1 modulo 10):
+
+\`\`\`
+d = 0. 5 9 1 4 ...
+\`\`\`
+
+Diese Zahl d unterscheidet sich von r₁ an Stelle 1, von r₂ an Stelle 2, von rₙ an Stelle n — also von *jeder* Zahl in der Liste. Sie fehlt. Die Liste war also nie vollständig — ein Widerspruch zur Annahme.
+
+Daraus folgt: Die Mächtigkeit von ℝ, bezeichnet als **𝔠** (Kontinuum), ist strikt größer als ℵ₀. Es gibt *mehr* reelle als natürliche Zahlen — obwohl beide Mengen unendlich sind.
+
+Cantor zeigte weiter, dass diese Hierarchie nicht endet: Die Potenzmenge jeder Menge ist stets mächtiger als die Menge selbst — es gibt unendlich viele Stufen des Unendlichen. Die Frage, ob zwischen ℵ₀ und 𝔠 eine weitere Mächtigkeit liegt, ist die berühmte **Kontinuumshypothese** — bis heute unentscheidbar innerhalb der Standardaxiome der Mathematik.`
     }
   };
 
   const topicLabels = {
     russell:     "Russells Paradoxon",
+    cantor:      "Cantors Diagonalargument",
     turing:      "Unentscheidbarkeit",
     rdd:         "Regression Discontinuity Design",
     iv:          "Instrumental Variable",
@@ -784,7 +843,7 @@ Das Hypothesentesten ist damit kein Wahrheitsdetektor — sondern ein präzises 
   };
 
   const categories = [
-    { label: "Mathematik",   keys: ["russell"] },
+    { label: "Mathematik",   keys: ["russell", "cantor"] },
     { label: "Informatik",   keys: ["turing"] },
     { label: "Data Science", keys: ["rdd", "iv", "pvalue"] },
     { label: "KI",           keys: ["overfitting", "harness"] },
