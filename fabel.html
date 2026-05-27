@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Science mit Fabel</title>
+  <title>Geschichten</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
@@ -44,8 +44,18 @@
     .topic-grid {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
+
+    .category-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-top: 24px;
+      margin-bottom: 2px;
+    }
+    .category-label:first-child { margin-top: 0; }
 
     .topic-card {
       width: 100%;
@@ -162,8 +172,8 @@
 
   <div id="view-topics">
     <a class="back-link" href="index.html">← zurück</a>
-    <h1>Data Science<br>mit Fabel</h1>
-    <p class="subtitle">Wähle ein Thema</p>
+    <h1>Geschichten</h1>
+    <p class="subtitle">Wähle eine Geschichte</p>
     <div class="topic-grid" id="topic-grid"></div>
   </div>
 
@@ -636,14 +646,23 @@ Die Konsequenzen sind tiefgreifend: Compiler können nicht allgemein prüfen, ob
   };
 
   const topicLabels = {
-    russell: "Russells Paradoxon",
-    turing: "Unentscheidbarkeit",
-    rdd: "Regression Discontinuity Design",
-    iv: "Instrumental Variable",
-    harness: "Agentenevaluation",
+    russell:  "Russells Paradoxon",
+    turing:   "Unentscheidbarkeit",
+    rdd:      "Regression Discontinuity Design",
+    iv:       "Instrumental Variable",
+    harness:  "Agentenevaluation",
     window_fn: "Window Functions (SQL)",
     topology: "Leitungssatz-Topologie"
   };
+
+  const categories = [
+    { label: "Mathematik",   keys: ["russell"] },
+    { label: "Informatik",   keys: ["turing"] },
+    { label: "Data Science", keys: ["rdd", "iv"] },
+    { label: "KI",           keys: ["harness"] },
+    { label: "SQL",          keys: ["window_fn"] },
+    { label: "Engineering",  keys: ["topology"] }
+  ];
 
   const grid = document.getElementById("topic-grid");
   const viewTopics = document.getElementById("view-topics");
@@ -651,12 +670,18 @@ Die Konsequenzen sind tiefgreifend: Compiler können nicht allgemein prüfen, ob
   const storyTitle = document.getElementById("story-title");
   const storyText = document.getElementById("story-text");
 
-  Object.entries(topicLabels).forEach(([key, label]) => {
-    const btn = document.createElement("button");
-    btn.className = "topic-card";
-    btn.textContent = label;
-    btn.addEventListener("click", () => showStory(key));
-    grid.appendChild(btn);
+  categories.forEach(cat => {
+    const lbl = document.createElement("p");
+    lbl.className = "category-label";
+    lbl.textContent = cat.label;
+    grid.appendChild(lbl);
+    cat.keys.forEach(key => {
+      const btn = document.createElement("button");
+      btn.className = "topic-card";
+      btn.textContent = topicLabels[key];
+      btn.addEventListener("click", () => showStory(key));
+      grid.appendChild(btn);
+    });
   });
 
   function showStory(key) {
