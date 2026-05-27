@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Science mit Fabel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      min-height: 100%;
+      padding: 48px 20px 64px;
+    }
+
+    .page { max-width: 640px; margin: 0 auto; }
+
+    .back-link {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: #bbb;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      margin-bottom: 40px;
+    }
+    .back-link:hover { color: #111; }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 40px;
+    }
+
+    .topic-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topic-card {
+      width: 100%;
+      padding: 18px 22px;
+      border: 1.5px solid #111;
+      background: none;
+      color: #111;
+      font: inherit;
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 2px;
+    }
+    .topic-card:hover, .topic-card:active {
+      background: #111;
+      color: #fff;
+    }
+
+    /* Story view */
+    #view-story { display: none; }
+    #view-story.active { display: block; }
+    #view-topics.hidden { display: none; }
+
+    .story-back {
+      background: none;
+      border: none;
+      font: inherit;
+      font-size: 0.8rem;
+      color: #bbb;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      padding: 0;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .story-back:hover { color: #111; }
+
+    #story-title {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    #story-text {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #333;
+      white-space: pre-wrap;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate { animation: fadeUp 0.3s ease both; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div id="view-topics">
+    <a class="back-link" href="index.html">← zurück</a>
+    <h1>Data Science<br>mit Fabel</h1>
+    <p class="subtitle">Wähle ein Thema</p>
+    <div class="topic-grid" id="topic-grid"></div>
+  </div>
+
+  <div id="view-story">
+    <button class="story-back" id="story-back-btn">← alle Themen</button>
+    <h2 id="story-title"></h2>
+    <div id="story-text"></div>
+  </div>
+
+</div>
+
+<script>
+  const stories = {
+    rdd: {
+      title: "Regression Discontinuity Design",
+      text: ""
+    }
+  };
+
+  const topicLabels = {
+    rdd: "Regression Discontinuity Design"
+  };
+
+  const grid = document.getElementById("topic-grid");
+  const viewTopics = document.getElementById("view-topics");
+  const viewStory = document.getElementById("view-story");
+  const storyTitle = document.getElementById("story-title");
+  const storyText = document.getElementById("story-text");
+
+  Object.entries(topicLabels).forEach(([key, label]) => {
+    const btn = document.createElement("button");
+    btn.className = "topic-card";
+    btn.textContent = label;
+    btn.addEventListener("click", () => showStory(key));
+    grid.appendChild(btn);
+  });
+
+  function showStory(key) {
+    const s = stories[key];
+    storyTitle.textContent = s.title;
+    storyText.textContent = s.text;
+    viewTopics.classList.add("hidden");
+    viewStory.classList.add("active");
+    viewStory.classList.add("animate");
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("story-back-btn").addEventListener("click", () => {
+    viewStory.classList.remove("active", "animate");
+    viewTopics.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  });
+</script>
+</body>
+</html>
