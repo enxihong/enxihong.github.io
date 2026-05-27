@@ -349,12 +349,51 @@ Ein wichtiger Punkt für Master-Niveau: IV schätzt nicht den durchschnittlichen
 IV erlaubt kausale Schätzung **ohne randomisiertes Experiment** — indem natürliche oder institutionelle Zufälle (*natural experiments*) genutzt werden. Klassische Beispiele in der Forschung sind: Geburtsmonat als Instrument für Bildungsjahre, Kriegslotterie als Instrument für Militärdienst, oder Entfernung zum nächsten Krankenhaus als Instrument für Behandlungsintensität.
 
 Die Methode zeigt: Manchmal steckt die größte Erkenntnis nicht im sorgfältig geplanten Experiment — sondern in der Baustelle, die jemand vergessen hat zu melden.`
+    },
+    harness: {
+      title: "Harness Engineering",
+      md: `## Die stille Prüferin
+
+Der alte Uhrmacher Teodor saß jeden Tag an seinem Tisch und reparierte Uhren – nicht für Geld, sondern weil er wissen wollte, *ob sie liefen*. Doch Teodor hatte ein Problem: Er konnte die Zeit selbst nicht messen. Keine seiner Referenzuhren war zuverlässig. Manche gingen vor, manche nach, und keine zeigte exakt das Gleiche.
+
+Also baute er sich etwas. Eine Vorrichtung – er nannte sie schlicht „die Prüferin". Sie hielt eine Uhr fest, spannte die Feder auf genau 40 Umdrehungen, öffnete die Hemmung für exakt einhundert Takte, und stoppte dann. Sie stellte immer dieselben Bedingungen her, ganz gleich, wer die Uhr einlegte, und ganz gleich, an welchem Morgen.
+
+Die Prüferin urteilte nicht. Sie fragte nicht, wie die Uhr hieß oder wer sie gebaut hatte. Sie kümmerte sich nicht darum, ob der Uhrmacher müde war. Sie wiederholte einfach denselben Handgriff, immer wieder, und notierte das Ergebnis in einem Buch.
+
+Bald bemerkte Teodor etwas Seltsames. Manche Uhren liefen in der Prüferin tadellos – und versagten trotzdem im Alltag. Andere wirkten grob und ungenau, schlugen sich draußen aber hervorragend. Die Prüferin zeigte ihm, was die Uhr *unter kontrollierten Bedingungen* tat. Was sie nicht zeigte, war, was die Uhr *in der Welt* tat.
+
+Das verwirrte ihn lange. Bis er verstand: Die Prüferin war kein Spiegel der Wirklichkeit. Sie war ein *Werkzeug zur Vergleichbarkeit*. Dank ihr konnte er zwei Uhren nebeneinander halten und sagen: „Diese hier ist unter denselben Bedingungen besser als jene." Ohne sie hätte er Äpfel mit Birnen verglichen – mal windig, mal still, mal mit müden Händen, mal mit frischen.
+
+Er baute noch mehr Prüferinnen. Für Ganggenauigkeit. Für Stoßfestigkeit. Für Kälte. Jede testete etwas anderes, immer reproduzierbar, immer ohne Gunst.
+
+Und so wurde Teodor nicht zum besten Uhrmacher, weil er die meiste Erfahrung hatte —
+
+sondern weil er *wusste, was er wirklich maß*.
+
+---
+
+## Das Konzept: Harness Engineering zur Evaluation von Agenten
+
+**Was ist ein Evaluation Harness?**
+
+In der KI-Forschung – besonders beim Testen von autonomen Agenten (z. B. LLM-basierten Systemen) – ist ein *Evaluation Harness* eine kontrollierte Testumgebung, die einen Agenten systematisch und reproduzierbar bewertet. Genau wie Teodors Prüferin stellt sie immer dieselben Bedingungen her, unabhängig vom Tester.
+
+**Isolation & Reproduzierbarkeit** — Der Agent wird in einer definierten Umgebung ausgeführt. Externe Variablen (Netzwerk, Zufall, Kontext) werden kontrolliert oder fixiert, damit zwei Läufe vergleichbar sind.
+
+**Aufgaben-Design (Task Suite)** — Das Harness enthält eine kuratierte Menge von Aufgaben, die verschiedene Fähigkeiten abdecken: Reasoning, Tool-Use, Fehlerkorrektur, Mehrschrittigkeit. Wie Teodors verschiedene Prüferinnen für Kälte oder Stoß.
+
+**Metriken vs. Proxy-Metriken** — Ein zentrales Problem: Was gemessen wird, ist oft nicht das, was eigentlich zählt. Ein Agent kann einen Benchmark „bestehen" und im echten Einsatz scheitern – genau wie Teodors Uhren, die in der Prüferin gut liefen, draußen aber versagten. Forscher nennen das *Goodhart's Law* oder *Benchmark Overfitting*.
+
+**Blind Evaluation & Bias-Kontrolle** — Das Harness urteilt mechanisch, nicht subjektiv. Dadurch werden menschliche Erwartungen, Reihenfolge-Effekte und Confirmation Bias eliminiert.
+
+**Die offene Frage** — Kein Harness ist vollständig. Die eigentliche Kunst liegt darin, Aufgaben zu entwerfen, die *valide* sind: die das messen, was im echten Einsatz relevant ist — und nicht nur das, was leicht zu messen ist.`
     }
   };
 
   const topicLabels = {
     rdd: "Regression Discontinuity Design",
-    iv: "Instrumental Variable"
+    iv: "Instrumental Variable",
+    harness: "Harness Engineering"
   };
 
   const grid = document.getElementById("topic-grid");
