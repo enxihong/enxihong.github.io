@@ -112,6 +112,26 @@
     }
     #story-text ul { padding-left: 1.4em; margin-bottom: 1.1em; }
     #story-text li { margin-bottom: 0.4em; }
+    #story-text h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 1.4em 0 0.5em;
+    }
+    #story-text ol { padding-left: 1.4em; margin-bottom: 1.1em; }
+    #story-text ol li { margin-bottom: 0.6em; }
+    #story-text table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.1em;
+      font-size: 0.88rem;
+    }
+    #story-text th, #story-text td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #story-text th { background: #f5f5f5; font-weight: 600; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
@@ -144,10 +164,22 @@
     return blocks.map(block => {
       const t = block.trim();
       if (/^-{3,}$/.test(t)) return '<hr>';
+      if (t.startsWith('### ')) return '<h3>' + inl(t.slice(4)) + '</h3>';
       if (t.startsWith('## ')) return '<h2>' + inl(t.slice(3)) + '</h2>';
       const lines = t.split('\n');
       if (lines.every(l => l.trim().startsWith('- '))) {
         return '<ul>' + lines.map(l => '<li>' + inl(l.trim().slice(2)) + '</li>').join('') + '</ul>';
+      }
+      if (lines.every(l => /^\d+\. /.test(l.trim()))) {
+        return '<ol>' + lines.map(l => '<li>' + inl(l.trim().replace(/^\d+\. /, '')) + '</li>').join('') + '</ol>';
+      }
+      if (lines.every(l => l.trim().startsWith('|'))) {
+        const rows = lines.filter(l => !/^\|[\s\-|]+$/.test(l.trim()));
+        const [header, ...body] = rows;
+        const cells = row => row.trim().replace(/^\||\|$/g, '').split('|').map(c => inl(c.trim()));
+        const ths = cells(header).map(c => '<th>' + c + '</th>').join('');
+        const trs = body.map(r => '<tr>' + cells(r).map(c => '<td>' + c + '</td>').join('') + '</tr>').join('');
+        return '<table><thead><tr>' + ths + '</tr></thead><tbody>' + trs + '</tbody></table>';
       }
       return '<p>' + inl(lines.join(' ')) + '</p>';
     }).join('');
@@ -204,11 +236,131 @@ Den kausalen Effekt schätzt man als den **Sprung** in der Ergebnisvariable, der
 **Kritische Annahme:** Es darf keine *Manipulation* an der Schwelle geben – niemand darf sich gezielt auf die begünstigte Seite manövrieren können. Genau wie in der Fabel: Welche Familie nördlich oder südlich der Brücke lebte, war Zufall der Geschichte, nicht des Willens.
 
 **Stärke:** Kein vollständiges Experiment nötig – eine willkürliche Grenze genügt. **Schwäche:** Die Ergebnisse gelten nur *lokal*, für Menschen nahe der Schwelle, nicht für alle.`
+    },
+    iv: {
+      title: "Instrumental Variable",
+      md: `## Die Kaffeepause
+
+Dr. Mira Voss lehnte sich in ihrem Bürostuhl zurück und starrte auf die zwei Stapel Akten auf ihrem Schreibtisch. Draußen regnete es, und der Geruch von frischem Kaffee zog durch das Krankenhaus der Universitätsklinik München.
+
+Sie war Kardiologin, aber seit drei Jahren beschäftigte sie sich hauptsächlich mit einer einzigen Frage: *Warum sterben manche Patienten mit Herzinsuffizienz trotz optimaler Behandlung früher?*
+
+Ihr Kollege Jonas kam herein, Kaffeebecher in der Hand.
+
+„Ich hab deine Auswertung gesehen", sagte er und setzte sich. „Beeindruckend. Patienten, die regelmäßig zur Kontrolluntersuchung kommen, leben im Schnitt zwei Jahre länger."
+
+„Ich weiß", sagte Mira. Aber sie klang nicht erfreut.
+
+„Du glaubst nicht daran?"
+
+Sie schüttelte den Kopf. „Ich glaube den Zahlen. Ich glaube nur nicht, dass wir verstehen, *warum*."
+
+---
+
+Jonas runzelte die Stirn. „Was gibt es da nicht zu verstehen? Wer zur Kontrolle kommt, bekommt rechtzeitig Anpassungen in der Medikation, wird besser überwacht. Natürlich leben diese Patienten länger."
+
+„Oder", sagte Mira, „wer zur Kontrolle kommt, ist sowieso jemand, der sich besser um sich selbst kümmert. Der auch die Medikamente regelmäßig nimmt. Der weniger raucht. Der Familie hat, die ihn erinnert."
+
+Jonas schwieg.
+
+„Unsere Daten", fuhr sie fort, „können das nicht auseinanderhalten. Wir sehen nur: Kontrolluntersuchung → längeres Leben. Aber wir wissen nicht, ob die Untersuchung selbst irgendetwas bewirkt — oder ob wir einfach die disziplinierteren, gesünderen Patienten beobachten."
+
+„Also müssten wir…" Jonas überlegte. „…eine randomisierte Studie machen. Zufällig zuweisen, wer kommt."
+
+„Genau. Und das", sagte Mira, „können wir ethisch nicht verantworten."
+
+---
+
+Wochen vergingen. Mira grübelte.
+
+Dann fiel ihr die Baustelle ein.
+
+Vor zwei Jahren hatte eine Straßensperrung rund um die Klinik dazu geführt, dass manche Patienten aus dem westlichen Stadtgebiet ihre Termine spontan absagen mussten — für fast vier Monate. Nicht weil sie wollten. Nicht weil sie kränker waren oder gesünder. Einfach, weil die Straße gesperrt war.
+
+Sie rief das Archiv an.
+
+---
+
+Drei Wochen später saß sie mit einem Berg Patientendaten vor sich.
+
+Sie teilte die Patienten auf: jene, die während der Sperrung im westlichen Einzugsgebiet wohnten, und jene, die ungehindert die Klinik erreichen konnten. Dann verglich sie — nicht direkt ihre Überlebenszeiten, sondern zunächst die Besuchshäufigkeit. Tatsächlich: Die Westpatienten hatten während dieser vier Monate deutlich weniger Kontrolltermine wahrgenommen.
+
+Und jetzt die entscheidende Frage: Wie war ihr weiteres Überleben?
+
+Mira tippte die letzten Parameter in ihr Modell.
+
+Das Ergebnis erschien auf dem Bildschirm.
+
+Sie lehnte sich zurück.
+
+Der Unterschied im Überleben zwischen den beiden Gruppen war… fast nicht vorhanden.
+
+---
+
+Jonas kam am nächsten Morgen wieder mit Kaffee. Mira hatte die Nacht durchgearbeitet.
+
+„Und?", fragte er.
+
+„Die Baustelle", sagte sie, „hat uns ein Experiment geschenkt, das wir nie hätten geplant bekommen. Zufällig. Ohne jemanden zu benachteiligen. Niemand wurde *ausgewählt*, weniger zu kommen — es war einfach die Straße."
+
+Jonas sah auf die Grafiken. „Das heißt… die Untersuchungen selbst verlängern das Leben vielleicht gar nicht so stark, wie wir dachten?"
+
+„Oder zumindest nicht so, wie unsere ursprünglichen Zahlen suggerierten. Der Effekt in unseren Daten vorher war zu einem guten Teil kein Effekt der Behandlung — er war ein Echo der Patienten selbst. Ihrer Eigenschaften, die wir nie gemessen haben."
+
+Jonas stellte seinen Becher ab. „Und die Baustelle hat das ausgelöscht."
+
+„Die Baustelle", sagte Mira leise, „hat uns von diesen Eigenschaften befreit. Sie hat uns gezwungen zu sehen, was wirklich wirkt — und was wir uns nur eingeredet haben."
+
+---
+
+Sie schaute aus dem Fenster. Der Regen hatte aufgehört. Irgendwo in der Stadt reparierte jemand eine Straße, und Mira dachte daran, wie viel Wahrheit manchmal in den Zufällen steckt, die uns das Leben aufzwingt — und wie selten wir sie erkennen.
+
+---
+
+## Das Konzept: Instrumental Variable (IV)
+
+Was Mira in der Geschichte intuitiv entdeckt, ist eine der elegantesten Methoden der Kausalinferenz: die **Instrumentalvariable** (*Instrumental Variable, IV*).
+
+### Das Grundproblem: Konfundierung
+
+Wenn wir beobachten, dass Patienten mit häufigen Kontrolluntersuchungen länger leben, können wir nicht einfach schlussfolgern, dass die Untersuchungen die Ursache sind. Es gibt **nicht gemessene, gemeinsame Ursachen** (Confounder) — etwa die allgemeine Disziplin oder das soziale Umfeld einer Person —, die sowohl die Besuchshäufigkeit als auch das Überleben beeinflussen. Klassische Regressionen oder Matching-Verfahren können diese **unbeobachteten Confounder** nicht beseitigen.
+
+### Die Lösung: Ein Instrument
+
+Eine Instrumentalvariable *Z* ist eine Variable, die drei Bedingungen erfüllt:
+
+| Bedingung | Bedeutung | Im Beispiel |
+|---|---|---|
+| **Relevanz** | Z beeinflusst die Behandlung X | Die Baustelle reduziert tatsächlich die Besuchshäufigkeit |
+| **Exogenität** | Z ist unabhängig von den Confoundern | Die Straßensperrung hat nichts mit der Gesundheitsmotivation der Patienten zu tun |
+| **Ausschlussbeschränkung** | Z beeinflusst das Outcome Y *nur* durch X | Die Baustelle beeinflusst das Überleben *ausschließlich* über weniger Arztbesuche — nicht direkt |
+
+Die Baustelle erfüllt alle drei: Sie ist zufällig entstanden, von den Patienteneigenschaften unabhängig, und hat keinen direkten Einfluss auf das Herz — nur auf die Terminhäufigkeit.
+
+### Die Schätzung: Two-Stage Least Squares (2SLS)
+
+In der Praxis verwendet man häufig das **Zwei-Stufen-Verfahren**:
+
+1. **Erste Stufe:** Schätze die Behandlung X (Besuchshäufigkeit) als Funktion des Instruments Z (Baustelle ja/nein) — extrahiere so den „exogenen", zufälligen Teil der Variation in X.
+2. **Zweite Stufe:** Schätze den Effekt dieser bereinigten Behandlung auf das Outcome Y (Überleben).
+
+Weil in Stufe 1 alle patientenseitigen Einflüsse herausgefiltert wurden, ist der in Stufe 2 geschätzte Koeffizient kausal interpretierbar — zumindest für jene Patienten, deren Verhalten das Instrument tatsächlich verändert hat.
+
+### Was IV schätzt: LATE
+
+Ein wichtiger Punkt für Master-Niveau: IV schätzt nicht den durchschnittlichen Behandlungseffekt für alle (*ATE*), sondern den **Local Average Treatment Effect (LATE)** — den Effekt für die sogenannten **Compliers**, also jene Patienten, die wegen der Baustelle tatsächlich seltener kamen und ihr Verhalten geändert hätten. Patienten, die so oder so kämen (Always-Takers) oder nie kämen (Never-Takers), fließen nicht in die Schätzung ein.
+
+### Warum ist das mächtig?
+
+IV erlaubt kausale Schätzung **ohne randomisiertes Experiment** — indem natürliche oder institutionelle Zufälle (*natural experiments*) genutzt werden. Klassische Beispiele in der Forschung sind: Geburtsmonat als Instrument für Bildungsjahre, Kriegslotterie als Instrument für Militärdienst, oder Entfernung zum nächsten Krankenhaus als Instrument für Behandlungsintensität.
+
+Die Methode zeigt: Manchmal steckt die größte Erkenntnis nicht im sorgfältig geplanten Experiment — sondern in der Baustelle, die jemand vergessen hat zu melden.`
     }
   };
 
   const topicLabels = {
-    rdd: "Regression Discontinuity Design"
+    rdd: "Regression Discontinuity Design",
+    iv: "Instrumental Variable"
   };
 
   const grid = document.getElementById("topic-grid");
