@@ -642,24 +642,80 @@ Was passiert, wenn man D mit sich selbst aufruft? H kann keine konsistente Antwo
 Das Halteproblem ist damit **unentscheidbar** — nicht nur schwer, sondern prinzipiell außerhalb jeder algorithmischen Reichweite.
 
 Die Konsequenzen sind tiefgreifend: Compiler können nicht allgemein prüfen, ob Code terminiert. Viren können nicht vollständig automatisch erkannt werden. Softwareverifikation hat unüberwindbare Grenzen. Turings Ergebnis definiert nicht, was Computer *heute* nicht können — sondern was sie **niemals** können werden.`
+    },
+    overfitting: {
+      title: "Overfitting",
+      md: `## Der Detektiv, der zu gut wurde
+
+Inspektor Maren galt als die beste Ermittlerin der Stadt. Zwölf Jahre Erfahrung, hunderte gelöste Fälle. Ihr Gedächtnis war legendär: Sie erinnerte sich an jeden Verdächtigen, jeden Tick, jede Lüge — und erkannte Muster, wo andere nur Zufall sahen.
+
+Dann kam der Mordfall in der Hafenstraße.
+
+Der Verdächtige hieß Tomás. Klein, nervöser Blick, zitterte beim Sprechen. Maren beobachtete ihn drei Minuten — und wusste es. *Er ist es.* Sie hatte diesen Typ hundertmal gesehen: schuldig, verängstigt, versteckt.
+
+Die Verhöre begannen. Tomás widersprach sich, schwieg an falschen Stellen, vermied Blickkontakt. Maren registrierte alles, baute ihren Fall — akkurat, lückenlos, überwältigend.
+
+Zwei Wochen später gestand jemand anderes.
+
+Maren saß allein in ihrem Büro. Auf dem Tisch lagen ihre Notizen — seitenweise Beobachtungen über Tomás. Alles stimmte. Alles passte. Und trotzdem war es falsch.
+
+Ihr Kollege Piet klopfte an. „Wie ist es passiert?"
+
+„Ich habe ihn zu gut gekannt", sagte sie leise. „Jeden Zug, den ich in zwölf Jahren gesehen habe — schuldig, nervös, versteckt. Tomás hatte all das. Also war er es." Sie legte die Notizen um. „Ich habe nicht ermittelt. Ich habe bestätigt."
+
+Piet setzte sich. „Du hast die Vergangenheit auswendig gelernt."
+
+„Ja. Und dann habe ich jeden neuen Menschen durch diese Schablone gepresst." Sie tippte auf ihre Schläfe. „Mein Kopf war so voll mit dem, was war — dass er keinen Platz mehr hatte für das, was *ist*."
+
+Piet dachte nach. „Also warst du zu präzise für die alten Daten?"
+
+„Präzise", wiederholte Maren bitter. „Ich war perfekt für Fälle, die ich bereits kannte. Für jeden neuen Fall war ich blind."
+
+Sie stand auf und sah aus dem Fenster auf den Hafen.
+
+„Ein guter Detektiv darf nicht alles erinnern. Er muss vergessen können — muss das Wesentliche vom Zufall trennen. Sonst jagt er für immer die Schatten alter Fälle."
+
+---
+
+## Das Konzept: Overfitting
+
+**Overfitting** bezeichnet eines der zentralen Probleme des maschinellen Lernens: Ein Modell lernt die Trainingsdaten so präzise, dass es deren Rauschen und Zufälligkeiten mitlernt — und dadurch auf neuen, ungesehenen Daten versagt.
+
+Ein overgefittetes Modell hat eine zu hohe **Modellkomplexität** relativ zur Datenmenge. Es minimiert den Trainingsfehler nahezu auf null, aber der **Generalisierungsfehler** — die Leistung auf echten Testdaten — ist hoch. Formal lässt sich das durch den **Bias-Variance-Tradeoff** beschreiben:
+
+- **Hohe Varianz** (Overfitting): Das Modell reagiert extrem sensibel auf kleine Schwankungen in den Trainingsdaten. Jeder Ausreißer wird als Signal interpretiert.
+- **Hoher Bias** (Underfitting): Das Modell ist zu simpel und erfasst selbst die echten Muster nicht.
+
+Das Ziel ist die Balance — ein Modell, das generalisiert, ohne zu vereinfachen.
+
+**Typische Gegenmaßnahmen:**
+
+- **Regularisierung** (L1/Lasso, L2/Ridge): Bestraft komplexe Modelle, indem große Gewichte im Verlust penalisiert werden.
+- **Dropout** (in neuronalen Netzen): Deaktiviert zufällig Neuronen im Training, um Ko-Adaptation zu verhindern.
+- **Cross-Validation**: Bewertet das Modell systematisch auf mehreren Datensplits, nicht nur einem.
+- **Early Stopping**: Bricht das Training ab, sobald der Validierungsfehler zu steigen beginnt.
+- **Mehr Daten**: Der robusteste Schutz — je mehr echte Variation im Training, desto schwerer wird Rauschen mitgelernt.
+
+Overfitting ist kein Versagen des Algorithmus — es ist ein Versagen der **Generalisierungsabsicht**. Ein Modell optimiert genau das, wofür man es trainiert. Wer es auf Perfektion im Training trimmt, bekommt Perfektion auf Daten, die längst bekannt sind — und Versagen auf allem, was danach kommt.`
     }
   };
 
   const topicLabels = {
-    russell:  "Russells Paradoxon",
-    turing:   "Unentscheidbarkeit",
-    rdd:      "Regression Discontinuity Design",
-    iv:       "Instrumental Variable",
-    harness:  "Agentenevaluation",
-    window_fn: "Window Functions (SQL)",
-    topology: "Leitungssatz-Topologie"
+    russell:    "Russells Paradoxon",
+    turing:     "Unentscheidbarkeit",
+    rdd:        "Regression Discontinuity Design",
+    iv:         "Instrumental Variable",
+    overfitting: "Overfitting",
+    harness:    "Agentenevaluation",
+    window_fn:  "Window Functions (SQL)",
+    topology:   "Leitungssatz-Topologie"
   };
 
   const categories = [
     { label: "Mathematik",   keys: ["russell"] },
     { label: "Informatik",   keys: ["turing"] },
     { label: "Data Science", keys: ["rdd", "iv"] },
-    { label: "KI",           keys: ["harness"] },
+    { label: "KI",           keys: ["overfitting", "harness"] },
     { label: "SQL",          keys: ["window_fn"] },
     { label: "Engineering",  keys: ["topology"] }
   ];
