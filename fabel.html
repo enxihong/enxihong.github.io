@@ -474,6 +474,46 @@ FROM besucher;
 **Warum es wichtig ist:** Window Functions ersetzen oft komplexe Self-Joins oder Subqueries und sind für Zeitreihenanalysen, Kohortenstudien und Performance-Rankings in großen Datensätzen unverzichtbar. Sie laufen effizienter als äquivalente Subqueries und sind in allen modernen SQL-Dialekten (PostgreSQL, BigQuery, Snowflake, Spark SQL) verfügbar.
 
 Marta hätte es so gesagt: *Man verlässt niemanden aus dem Blick — aber man rechnet trotzdem.*`
+    },
+    topology: {
+      title: "Leitungssatz-Topologie",
+      md: `## Die Dirigentin
+
+Es war ihr letztes Konzert vor der Rente, und niemand im Saal wusste, dass das Orchester kurz vor dem Kollaps stand.
+
+Luisa hatte dreißig Jahre lang dasselbe Prinzip verfolgt: Jeder Musiker war mit ihr verbunden, aber nicht auf dieselbe Weise. Die ersten Geigen liefen direkt zu ihr – kurze, dicke Linien der Autorität. Die Schlagzeuger hingegen erreichte sie über die Konzertmeisterin, die wiederum über den ersten Bratschisten lief. Wege, die sich verzweigten und bündelten wie Äste eines Baumes, der im Rücken der Bühne unsichtbar wuchs.
+
+Heute Abend fehlte der zweite Oboist. Kein Problem, dachte das Publikum. Ein Sitz blieb leer.
+
+Aber Luisa wusste, dass der zweite Oboist auch die Noten für den dritten Hornisten weitergereicht hatte. Und der dritte Hornist war der einzige Mensch, der in der Pause den Flötistinnen das Tempowechsel-Signal gab. Ohne dieses Signal würden die Flötistinnen im zweiten Satz um vier Takte zu früh einsetzen. Und die Flötistinnen – das hatte die Generalprobe gezeigt – rissen die Streicher mit sich.
+
+Ein fehlender Musiker. Vier Takte Versatz. Achtzehn Instrumente außer Kontrolle.
+
+Sie hatte die Abende damit verbracht, Karten zu zeichnen. Wer gibt wem ein Zeichen? Welcher Pfad trägt wie viel Last? Wo bricht das System, wenn ein Knoten ausfällt? Sie nannte es ihre „stille Architektur" – das Unsichtbare, das alles zusammenhält.
+
+Heute Abend hatte sie den Pfad umgeleitet. Die Konzertmeisterin würde das Tempowechsel-Signal direkt übernehmen. Ein neuer Ast, provisorisch, aber stark genug.
+
+Der erste Takt erklang. Makellos.
+
+Hinterher sagte jemand: „Großartige Leistung. Alles lief wie am Schnürchen."
+
+Luisa lächelte. *Wie am Schnürchen.* Wenn sie nur wüssten.
+
+---
+
+## Das Konzept: Leitungssatz-Topologie und Lastpfadanalyse
+
+Im **Harness Engineering** bezeichnet die **Topologie** eines Kabelbaums die strukturelle Anordnung aller elektrischen Verbindungen: Wer ist mit wem verbunden? Über welche Wege fließt Strom? Wo gibt es Verteilerknoten (Splices, Connector Hubs), und welche Leitungen tragen wie viel Last?
+
+Die **Lastpfadanalyse** geht einen Schritt weiter: Sie untersucht, welche Konsequenzen entstehen, wenn ein Pfad ausfällt – durch Leitungsbruch, Steckerfehler oder Überlast. Kritische Fragen sind dabei:
+
+- **Propagation**: Führt ein lokaler Fehler zu einem systemweiten Ausfall?
+- **Redundanz**: Gibt es alternative Strompfade (parallele Leitungen, Bypass-Routen)?
+- **Derating**: Ist jede Leitung für die tatsächlich fließende Last ausgelegt – inklusive aller Lastfälle und Toleranzen?
+
+Im Fahrzeug- und Luftfahrtbereich ist diese Analyse sicherheitskritisch: Ein falsch dimensionierter Splice, der mehrere Verbraucher versorgt, kann bei Überlast thermisch versagen und kaskadenartige Ausfälle auslösen – genau wie Luisas fehlender Oboist, der über mehrere Zwischenglieder das gesamte Orchester destabilisierte.
+
+Das Ziel guten Harness Engineerings ist deshalb: **Topologien entwerfen, die robust gegenüber Einzelausfällen sind** – durch bewusste Pfadplanung, Schutzschalterkoordination und durchdachte Redundanzarchitektur.`
     }
   };
 
@@ -481,7 +521,8 @@ Marta hätte es so gesagt: *Man verlässt niemanden aus dem Blick — aber man r
     rdd: "Regression Discontinuity Design",
     iv: "Instrumental Variable",
     harness: "Agentenevaluation",
-    window_fn: "Window Functions (SQL)"
+    window_fn: "Window Functions (SQL)",
+    topology: "Leitungssatz-Topologie"
   };
 
   const grid = document.getElementById("topic-grid");
