@@ -194,48 +194,42 @@
   const stories = {
     rdd: {
       title: "Regression Discontinuity Design",
-      md: `## Die Brücke von Silbertal
+      md: `## Die Brücke von Montaverde
 
-In einem Königreich lagen zwei Dörfer nur einen Tagesmarsch voneinander entfernt: **Unterbach** und **Oberbach**. Beide im selben Tal, dasselbe Wasser, dieselben Götter. Doch seit Generationen hieß es in Unterbach: *„Die Oberbacher sind fleißiger. Wohlhabender."*
+Der alte Umberto Casale hatte sein Leben lang Weinreben gepflanzt. Sein Bruder Enzo auch. Beide Männer stammten aus demselben Tal, tranken denselben Brunnen leer, lernten bei demselben Vater das Pfropfen. Und doch: Umbertos Wein wurde berühmt. Enzos Wein blieb mittelmäßig.
 
-Ein junger Gelehrter namens Fionn wollte es wissen.
+Die Leute im Dorf sagten, Umberto habe einfach mehr Talent. Vielleicht. Aber niemand fragte genauer nach.
 
----
+Ich fragte nach.
 
-Das Erste, was ihm auffiel, war die Brücke. Eine schiefe Steinbrücke über den schmalen Fluss Silber, mit einem verwitterten Meilenstein: diesseits *Unterbach*, jenseits *Oberbach*.
+Es stellte sich heraus, dass das Tal vor dreißig Jahren durch einen Fluss geteilt worden war — unscheinbar, kaum dreißig Meter breit. Die Regionalregierung hatte damals ein Förderprogramm aufgelegt: Winzer auf der westlichen Seite des Flusses erhielten Beratung, neue Gerätschaften, subventionierte Anbaukurse. Die östliche Seite: nichts. Die Grenze war nicht nach Bodenbeschaffenheit gezogen worden, nicht nach Qualität der Reben, nicht nach Talent der Bauern. Sie war administrativ festgelegt worden — nach einem alten Katasterplan, der selbst eine Kuriosität der Geschichte war.
 
-Fionn befragte hundert Familien, fünfzig auf jeder Seite, und notierte Ernte, Vieh, Wohlstand. Tatsächlich: Die Oberbacher hatten mehr.
+Umberto wohnte westwärts. Enzo ostwärts. Umberto lag sieben Meter jenseits der Grenzlinie.
 
-Aber dann sortierte er die Familien nach ihrer **Entfernung zur Brücke** – und staunte. Die Familien direkt an der Brücke ähnelten sich auf beiden Seiten stark. Gleiche Felder, ähnliche Scheunen, vergleichbarer Besitz. Doch genau beim Überqueren des Meilensteins machte der Wohlstand einen Satz – nicht langsam, nicht allmählich. Einen plötzlichen Sprung.
+Sieben Meter.
 
-*Warum sollte ein Stein aus Marmor das Schicksal einer Familie ändern?*, dachte Fionn.
+Ich begann, Daten zu sammeln. Alle Winzer im Umkreis von zwei Kilometern um den Fluss. Je näher zwei Betriebe an der Grenzlinie lagen — einer links, einer rechts —, desto ähnlicher waren sie in allem: Bodengüte, Niederschlag, Erfahrung, Betriebsgröße. Und doch: auf der Westseite, Jahr für Jahr, bessere Erträge, höhere Qualität, wachsende Bekanntheit.
 
-Er grub in alten Chroniken – und fand es. Vor siebzig Jahren hatte ein Fürst verfügt: Jede Familie **nördlich der Brücke** durfte ihre Söhne kostenlos in die Gildenhandwerksschulen der Hauptstadt schicken. Die südlichen nicht. Die Grenze war rein administrativ gewesen, längst vergessen. Aber ihre Wirkung hatte sich über Generationen fortgepflanzt.
+Am Fluss selbst war der Unterschied scharf wie ein Schnitt.
 
----
-
-Fionn kehrte zur Dorfältesten zurück.
-
-„Die Oberbacher kommen nicht aus besserem Holz", sagte er. „Wenn es am Charakter läge, wäre der Unterschied *überall* sichtbar – auch zehn Schritte vor der Brücke. Aber er taucht nur genau *an* der Brücke auf. Das verrät: Nicht der Mensch ist anders. Nur die Regel, die für ihn galt."
+Da verstand ich: Nicht Umbertos Talent hatte ihn von Enzo getrennt. Es war eine Linie auf einer alten Karte.
 
 ---
 
 ## Das Konzept: Regression Discontinuity Design (RDD)
 
-**Was Fionn gemacht hat, ist im Kern ein Regression Discontinuity Design.**
+**RDD** nutzt eine künstliche Schwelle — eine Fördergrenze, eine Prüfungsnote, ein Geburtsdatum — als natürliches Experiment. Die Grundidee: Einheiten, die knapp ober- oder unterhalb dieser Grenze liegen, sind im Durchschnitt nahezu identisch. Wer beispielsweise mit 59 Punkten nicht gefördert wird, ist kaum anders als jemand mit 61 Punkten, der Förderung erhält.
 
-Das RDD nutzt eine **Schwelle (Cutoff)**, an der eine Behandlung abrupt einsetzt – und die vom Individuum selbst nicht kontrollierbar ist. Die zentrale Idee: Wer knapp ober- oder unterhalb dieser Schwelle liegt, ist im Durchschnitt fast identisch in allen beobachtbaren *und* unbeobachtbaren Eigenschaften. Der einzige systematische Unterschied ist, ob man die Behandlung erhalten hat. Damit entsteht lokal etwas, das einem randomisierten Experiment sehr nahekommt.
+Dieser scharfe Sprung in der Behandlung bei kontinuierlichen Hintergrundmerkmalen erlaubt einen kausalen Schluss: Ein beobachteter Sprung im Ergebnis direkt an der Schwelle kann kausal auf die Intervention zurückgeführt werden — nicht auf vorher bestehende Unterschiede.
 
-Den kausalen Effekt schätzt man als den **Sprung** in der Ergebnisvariable, der genau an der Schwelle auftritt.
+**Zwei Varianten:**
 
-**Beispiele aus der Forschung:**
+- **Sharp RDD**: Alle, die die Schwelle überschreiten, erhalten die Behandlung — wie im Fall von Umberto und Enzo.
+- **Fuzzy RDD**: Die Wahrscheinlichkeit der Behandlung steigt an der Schwelle stark an, aber nicht auf 100 % (z. B. weil manche Berechtigten das Angebot ablehnen). Hier verwendet man die Schwelle als Instrument.
 
-- Schüler knapp ober- oder unterhalb eines Notenschnitts für ein Stipendium → Effekt auf Studienerfolg
-- Wahlkreise, die knapp mit einer Stimme Mehrheit entschieden wurden → Effekt politischer Macht auf Politikergebnisse
+**Die entscheidende Annahme**: Individuen können ihre Zugehörigkeit zur behandelten Gruppe nicht gezielt manipulieren. Wenn Winzer ihre Grundstücke nicht verschieben können, ist die Zuteilung nahe der Grenze quasi-zufällig — und damit glaubwürdig exogen.
 
-**Kritische Annahme:** Es darf keine *Manipulation* an der Schwelle geben – niemand darf sich gezielt auf die begünstigte Seite manövrieren können. Genau wie in der Fabel: Welche Familie nördlich oder südlich der Brücke lebte, war Zufall der Geschichte, nicht des Willens.
-
-**Stärke:** Kein vollständiges Experiment nötig – eine willkürliche Grenze genügt. **Schwäche:** Die Ergebnisse gelten nur *lokal*, für Menschen nahe der Schwelle, nicht für alle.`
+RDD ist besonders wertvoll, weil er kausal argumentiert, ohne eine randomisierte Studie zu erfordern. Er nutzt, was die Welt ohnehin produziert: willkürliche Grenzen. Und macht daraus Wissen.`
     },
     iv: {
       title: "Instrumental Variable",
