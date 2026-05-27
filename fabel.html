@@ -697,24 +697,96 @@ Das Ziel ist die Balance — ein Modell, das generalisiert, ohne zu vereinfachen
 - **Mehr Daten**: Der robusteste Schutz — je mehr echte Variation im Training, desto schwerer wird Rauschen mitgelernt.
 
 Overfitting ist kein Versagen des Algorithmus — es ist ein Versagen der **Generalisierungsabsicht**. Ein Modell optimiert genau das, wofür man es trainiert. Wer es auf Perfektion im Training trimmt, bekommt Perfektion auf Daten, die längst bekannt sind — und Versagen auf allem, was danach kommt.`
+    },
+    pvalue: {
+      title: "Hypothesentesten & p-Wert",
+      md: `## Die Richterin und die tausend Münzen
+
+Richterin Sorel war bekannt für eines: Sie glaubte niemandem — ohne Beweis.
+
+Eines Tages betrat ein Mann namens Cassian ihren Gerichtssaal. Er behauptete, eine besondere Münze zu besitzen. Keine gewöhnliche — eine, die grundsätzlich öfter Kopf zeige als Zahl. Er wollte damit Wetten gewinnen, legal, und brauchte ihre offizielle Beglaubigung.
+
+„Beweise es", sagte Sorel.
+
+Cassian warf die Münze. Kopf. Noch einmal. Kopf. Und noch einmal.
+
+Nach zehn Würfen: achtmal Kopf, zweimal Zahl.
+
+Der Anwalt neben ihm lächelte. „Achtzig Prozent. Überzeugt?"
+
+Sorel verschränkte die Arme. „Nein. Auch eine faire Münze kann zehnmal hintereinander fast nur Kopf zeigen. Das beweist nichts."
+
+Cassian warf weiter. Fünfzig Würfe. Hundert. Nach zweihundert Würfen: 119 mal Kopf. Fast 60 Prozent.
+
+Der Anwalt wurde ungeduldig. „Das ist doch kein Zufall mehr."
+
+„Vielleicht", sagte Sorel. „Aber ich brauche eine Zahl. Keine Meinung."
+
+Sie rief ihre Statistikerin. Die Frau rechnete kurz. „Bei einer fairen Münze und zweihundert Würfen wäre ein Ergebnis wie dieses — oder ein noch extremeres — mit einer Wahrscheinlichkeit von unter zwei Prozent zu erwarten."
+
+Stille im Saal.
+
+„Zwei Prozent", wiederholte Sorel langsam. „Das heißt: Wäre die Münze fair, wäre das hier trotzdem möglich — nur sehr unwahrscheinlich."
+
+„Ja", sagte die Statistikerin.
+
+„Aber es heißt nicht, dass die Münze zu neunundneunzig Prozent unfair ist?"
+
+Die Statistikerin zögerte. „Nein. Das ist ein anderer Satz."
+
+Cassian runzelte die Stirn. Sorel sah ihn an.
+
+„Ich beglaubige Folgendes", sagte sie schließlich. „Wenn deine Münze fair wäre, hätten wir heute etwas sehr Unwahrscheinliches erlebt. Ob sie es ist — das sage ich nicht."
+
+Sie lehnte sich vor. „Mein Urteil lautet: Die Daten sprechen gegen die Annahme einer fairen Münze. Mehr nicht. Die Wahrheit bleibt draußen."
+
+Cassian verstand nicht ganz. Aber die Statistikerin nickte langsam — so wie jemand nickt, der genau weiß, wie präzise eine Aussage gerade war.
+
+---
+
+## Das Konzept: Hypothesentesten und der p-Wert
+
+Das **Hypothesentesten** ist ein formales Verfahren, um auf Basis von Daten zwischen zwei konkurrierenden Annahmen zu unterscheiden — ohne jemals direkte Wahrheit zu beanspruchen.
+
+Die Struktur ist immer gleich:
+
+- **Nullhypothese H₀**: Die konservative Annahme — hier: „Die Münze ist fair" (p = 0,5).
+- **Alternativhypothese H₁**: Die zu zeigende Behauptung — „Die Münze ist unfair" (p ≠ 0,5).
+
+Der **p-Wert** beantwortet eine sehr präzise Frage: *Wie wahrscheinlich wäre ein Ergebnis wie das beobachtete — oder ein noch extremeres — wenn H₀ wahr wäre?*
+
+Ein kleiner p-Wert (typisch: p < 0,05) bedeutet: Die Daten sind unter H₀ sehr unwahrscheinlich. Man **verwirft H₀** — aber man beweist H₁ damit nicht.
+
+Was der p-Wert **nicht** ist, wird häufig falsch verstanden:
+
+- Er ist **nicht** die Wahrscheinlichkeit, dass H₀ wahr ist.
+- Er ist **nicht** die Wahrscheinlichkeit, dass das Ergebnis durch Zufall entstand.
+- Er sagt **nichts** über die Größe oder Bedeutsamkeit eines Effekts.
+
+Genau das formuliert Richterin Sorel: Ein p-Wert von 0,02 bedeutet nicht „99 % Chance, dass die Münze unfair ist" — das wäre eine **bayesianische** Aussage, die einen Prior erfordern würde. Der frequentistische p-Wert bleibt bewusst außerhalb dieser Aussage.
+
+Ergänzend sprechen Statistiker von **Signifikanzniveau α** (dem vorab festgelegten Schwellenwert), **Teststärke** (Power: Wahrscheinlichkeit, H₀ zu verwerfen, wenn H₁ wahr ist) und **Fehlerarten**: Typ-I-Fehler (H₀ fälschlicherweise verworfen) und Typ-II-Fehler (H₁ fälschlicherweise übersehen).
+
+Das Hypothesentesten ist damit kein Wahrheitsdetektor — sondern ein präzises Instrument zur **Kontrolle von Irrtümern**: Es legt fest, wie oft wir bereit sind, uns zu täuschen, bevor wir handeln.`
     }
   };
 
   const topicLabels = {
-    russell:    "Russells Paradoxon",
-    turing:     "Unentscheidbarkeit",
-    rdd:        "Regression Discontinuity Design",
-    iv:         "Instrumental Variable",
+    russell:     "Russells Paradoxon",
+    turing:      "Unentscheidbarkeit",
+    rdd:         "Regression Discontinuity Design",
+    iv:          "Instrumental Variable",
+    pvalue:      "Hypothesentesten & p-Wert",
     overfitting: "Overfitting",
-    harness:    "Agentenevaluation",
-    window_fn:  "Window Functions (SQL)",
-    topology:   "Leitungssatz-Topologie"
+    harness:     "Agentenevaluation",
+    window_fn:   "Window Functions (SQL)",
+    topology:    "Leitungssatz-Topologie"
   };
 
   const categories = [
     { label: "Mathematik",   keys: ["russell"] },
     { label: "Informatik",   keys: ["turing"] },
-    { label: "Data Science", keys: ["rdd", "iv"] },
+    { label: "Data Science", keys: ["rdd", "iv", "pvalue"] },
     { label: "KI",           keys: ["overfitting", "harness"] },
     { label: "SQL",          keys: ["window_fn"] },
     { label: "Engineering",  keys: ["topology"] }
