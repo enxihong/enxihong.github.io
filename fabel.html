@@ -132,6 +132,23 @@
       vertical-align: top;
     }
     #story-text th { background: #f5f5f5; font-weight: 600; }
+    #story-text code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      background: #f0f0f0;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    #story-text pre {
+      background: #f8f8f8;
+      border: 1px solid #e4e4e4;
+      border-radius: 4px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      margin-bottom: 1.1em;
+      line-height: 1.6;
+    }
+    #story-text pre code { background: none; padding: 0; border-radius: 0; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
@@ -164,6 +181,11 @@
     return blocks.map(block => {
       const t = block.trim();
       if (/^-{3,}$/.test(t)) return '<hr>';
+      if (t.startsWith('```')) {
+        const code = t.replace(/^```\w*\n?/, '').replace(/\n?```$/, '');
+        const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<pre><code>' + esc + '</code></pre>';
+      }
       if (t.startsWith('### ')) return '<h3>' + inl(t.slice(4)) + '</h3>';
       if (t.startsWith('## ')) return '<h2>' + inl(t.slice(3)) + '</h2>';
       const lines = t.split('\n');
@@ -188,7 +210,8 @@
   function inl(s) {
     return s
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
   }
 
   const stories = {
@@ -387,13 +410,78 @@ In der KI-Forschung – besonders beim Testen von autonomen Agenten (z. B. LLM-b
 **Blind Evaluation & Bias-Kontrolle** — Das Harness urteilt mechanisch, nicht subjektiv. Dadurch werden menschliche Erwartungen, Reihenfolge-Effekte und Confirmation Bias eliminiert.
 
 **Die offene Frage** — Kein Harness ist vollständig. Die eigentliche Kunst liegt darin, Aufgaben zu entwerfen, die *valide* sind: die das messen, was im echten Einsatz relevant ist — und nicht nur das, was leicht zu messen ist.`
+    },
+    window_fn: {
+      title: "Window Functions in SQL",
+      md: `## Die Frau am Fenster
+
+Die Bibliothek öffnete jeden Morgen um acht Uhr, und jeden Morgen saß Marta bereits drinnen — an ihrem Stammplatz, dem langen Tisch am Fenster im zweiten Stock.
+
+Sie beobachtete die anderen. Das war ihre stille Leidenschaft.
+
+Den alten Herrn mit dem Hut, der immer als Erster ankam und sich Sessel Nummer drei sicherte. Die Studentin mit den roten Turnschuhen, die täglich eine neue Thermosflasche mitbrachte. Den Mann mittleren Alters, der nie ein Buch aufschlug, aber stundenlang ins Leere starrte.
+
+Marta machte sich Notizen. Nicht über einzelne Personen — sondern über Muster.
+
+Sie notierte: *Wer kommt täglich früher als der Vortag?* Sie betrachtete jeden Besucher nicht isoliert, sondern immer im Verhältnis zu allen anderen und zur eigenen Geschichte. Der alte Herr mit dem Hut hatte sich letzte Woche dreimal verspätet — aber seine Drei-Wochen-Bilanz war makellos.
+
+Das Entscheidende war: Marta verließ niemanden aus ihrer Betrachtung. Wenn sie über die Studentin nachdachte, blieb die gesamte Gruppe sichtbar. Die Studentin existierte *innerhalb* der Gemeinschaft, nicht herausgeschnitten aus ihr.
+
+Eines Tages fragte ein junger Bibliothekar, was sie da eigentlich tue.
+
+„Ich teile nicht auf", sagte Marta. „Die meisten Menschen, wenn sie etwas verstehen wollen, nehmen einen heraus und schauen ihn allein an. Ich behalte den Rahmen. Ich berechne, wo jemand steht — aber ohne die Gruppe zu zerstören."
+
+Der Bibliothekar runzelte die Stirn. „Wie eine... Rangliste, die die Tabelle nicht verändert?"
+
+Marta lächelte. „Genau. Ich schiebe ein Fenster über die Zeit. Ich sehe den Einzelnen — und trotzdem alle."
+
+---
+
+## Das Konzept: Window Functions in SQL
+
+**Window Functions** (analytische Funktionen) berechnen Werte über eine Menge von Zeilen — das sogenannte *Fenster* — ohne die zugrundeliegende Tabelle zu aggregieren oder Zeilen zu entfernen.
+
+Im Gegensatz zu \`GROUP BY\`, das Zeilen zu einer einzigen Ergebniszeile zusammenfasst, bleibt bei Window Functions jede Zeile erhalten. Der berechnete Wert bezieht sich jedoch auf den definierten Rahmen (Partition + Sortierung + Frame).
+
+**Grundstruktur:**
+
+\`\`\`sql
+SELECT
+  name,
+  besuche,
+  RANK() OVER (PARTITION BY kategorie ORDER BY besuche DESC) AS rang,
+  AVG(besuche) OVER (PARTITION BY kategorie) AS durchschnitt
+FROM besucher;
+\`\`\`
+
+**Schlüsselkomponenten:**
+
+- **\`OVER()\`** — aktiviert die Window Function; ohne sie wäre es eine normale Aggregation
+- **\`PARTITION BY\`** — teilt die Daten in logische Gruppen (wie Martas „Fenster" über Besuchertypen)
+- **\`ORDER BY\`** (innerhalb von OVER) — definiert die Reihenfolge für Rankings oder Laufwerte
+- **\`ROWS/RANGE BETWEEN\`** — steuert den genauen Frame, z. B. gleitende Durchschnitte der letzten 7 Tage
+
+**Typische Anwendungsfälle:**
+
+| Funktion | Verwendung |
+|---|---|
+| \`ROW_NUMBER()\` | Eindeutige Zeilennummerierung pro Partition |
+| \`RANK()\` / \`DENSE_RANK()\` | Rankings mit/ohne Lücken bei Gleichstand |
+| \`LAG()\` / \`LEAD()\` | Zugriff auf Vorgänger-/Nachfolgezeilen |
+| \`SUM() OVER (... ROWS BETWEEN ...)\` | Gleitende Summen / kumulative Werte |
+| \`NTILE(n)\` | Einteilung in n gleichgroße Quantilgruppen |
+
+**Warum es wichtig ist:** Window Functions ersetzen oft komplexe Self-Joins oder Subqueries und sind für Zeitreihenanalysen, Kohortenstudien und Performance-Rankings in großen Datensätzen unverzichtbar. Sie laufen effizienter als äquivalente Subqueries und sind in allen modernen SQL-Dialekten (PostgreSQL, BigQuery, Snowflake, Spark SQL) verfügbar.
+
+Marta hätte es so gesagt: *Man verlässt niemanden aus dem Blick — aber man rechnet trotzdem.*`
     }
   };
 
   const topicLabels = {
     rdd: "Regression Discontinuity Design",
     iv: "Instrumental Variable",
-    harness: "Agentenevaluation"
+    harness: "Agentenevaluation",
+    window_fn: "Window Functions (SQL)"
   };
 
   const grid = document.getElementById("topic-grid");
