@@ -97,8 +97,21 @@
       font-size: 0.95rem;
       line-height: 1.8;
       color: #333;
-      white-space: pre-wrap;
     }
+    #story-text p { margin-bottom: 1.1em; }
+    #story-text h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 1.8em 0 0.6em;
+    }
+    #story-text hr {
+      border: none;
+      border-top: 1.5px solid #eee;
+      margin: 1.8em 0;
+    }
+    #story-text ul { padding-left: 1.4em; margin-bottom: 1.1em; }
+    #story-text li { margin-bottom: 0.4em; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
@@ -126,10 +139,71 @@
 </div>
 
 <script>
+  function renderMd(md) {
+    const blocks = md.trim().split(/\n\n+/);
+    return blocks.map(block => {
+      const t = block.trim();
+      if (/^-{3,}$/.test(t)) return '<hr>';
+      if (t.startsWith('## ')) return '<h2>' + inl(t.slice(3)) + '</h2>';
+      const lines = t.split('\n');
+      if (lines.every(l => l.trim().startsWith('- '))) {
+        return '<ul>' + lines.map(l => '<li>' + inl(l.trim().slice(2)) + '</li>').join('') + '</ul>';
+      }
+      return '<p>' + inl(lines.join(' ')) + '</p>';
+    }).join('');
+  }
+
+  function inl(s) {
+    return s
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+
   const stories = {
     rdd: {
       title: "Regression Discontinuity Design",
-      text: ""
+      md: `## Die Brücke von Silbertal
+
+In einem Königreich lagen zwei Dörfer nur einen Tagesmarsch voneinander entfernt: **Unterbach** und **Oberbach**. Beide im selben Tal, dasselbe Wasser, dieselben Götter. Doch seit Generationen hieß es in Unterbach: *„Die Oberbacher sind fleißiger. Wohlhabender."*
+
+Ein junger Gelehrter namens Fionn wollte es wissen.
+
+---
+
+Das Erste, was ihm auffiel, war die Brücke. Eine schiefe Steinbrücke über den schmalen Fluss Silber, mit einem verwitterten Meilenstein: diesseits *Unterbach*, jenseits *Oberbach*.
+
+Fionn befragte hundert Familien, fünfzig auf jeder Seite, und notierte Ernte, Vieh, Wohlstand. Tatsächlich: Die Oberbacher hatten mehr.
+
+Aber dann sortierte er die Familien nach ihrer **Entfernung zur Brücke** – und staunte. Die Familien direkt an der Brücke ähnelten sich auf beiden Seiten stark. Gleiche Felder, ähnliche Scheunen, vergleichbarer Besitz. Doch genau beim Überqueren des Meilensteins machte der Wohlstand einen Satz – nicht langsam, nicht allmählich. Einen plötzlichen Sprung.
+
+*Warum sollte ein Stein aus Marmor das Schicksal einer Familie ändern?*, dachte Fionn.
+
+Er grub in alten Chroniken – und fand es. Vor siebzig Jahren hatte ein Fürst verfügt: Jede Familie **nördlich der Brücke** durfte ihre Söhne kostenlos in die Gildenhandwerksschulen der Hauptstadt schicken. Die südlichen nicht. Die Grenze war rein administrativ gewesen, längst vergessen. Aber ihre Wirkung hatte sich über Generationen fortgepflanzt.
+
+---
+
+Fionn kehrte zur Dorfältesten zurück.
+
+„Die Oberbacher kommen nicht aus besserem Holz", sagte er. „Wenn es am Charakter läge, wäre der Unterschied *überall* sichtbar – auch zehn Schritte vor der Brücke. Aber er taucht nur genau *an* der Brücke auf. Das verrät: Nicht der Mensch ist anders. Nur die Regel, die für ihn galt."
+
+---
+
+## Das Konzept: Regression Discontinuity Design (RDD)
+
+**Was Fionn gemacht hat, ist im Kern ein Regression Discontinuity Design.**
+
+Das RDD nutzt eine **Schwelle (Cutoff)**, an der eine Behandlung abrupt einsetzt – und die vom Individuum selbst nicht kontrollierbar ist. Die zentrale Idee: Wer knapp ober- oder unterhalb dieser Schwelle liegt, ist im Durchschnitt fast identisch in allen beobachtbaren *und* unbeobachtbaren Eigenschaften. Der einzige systematische Unterschied ist, ob man die Behandlung erhalten hat. Damit entsteht lokal etwas, das einem randomisierten Experiment sehr nahekommt.
+
+Den kausalen Effekt schätzt man als den **Sprung** in der Ergebnisvariable, der genau an der Schwelle auftritt.
+
+**Beispiele aus der Forschung:**
+
+- Schüler knapp ober- oder unterhalb eines Notenschnitts für ein Stipendium → Effekt auf Studienerfolg
+- Wahlkreise, die knapp mit einer Stimme Mehrheit entschieden wurden → Effekt politischer Macht auf Politikergebnisse
+
+**Kritische Annahme:** Es darf keine *Manipulation* an der Schwelle geben – niemand darf sich gezielt auf die begünstigte Seite manövrieren können. Genau wie in der Fabel: Welche Familie nördlich oder südlich der Brücke lebte, war Zufall der Geschichte, nicht des Willens.
+
+**Stärke:** Kein vollständiges Experiment nötig – eine willkürliche Grenze genügt. **Schwäche:** Die Ergebnisse gelten nur *lokal*, für Menschen nahe der Schwelle, nicht für alle.`
     }
   };
 
@@ -154,7 +228,7 @@
   function showStory(key) {
     const s = stories[key];
     storyTitle.textContent = s.title;
-    storyText.textContent = s.text;
+    storyText.innerHTML = renderMd(s.md);
     viewTopics.classList.add("hidden");
     viewStory.classList.add("active");
     viewStory.classList.add("animate");
