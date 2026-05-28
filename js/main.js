@@ -25,15 +25,25 @@ function showOverlay(title,sub){overlayTitle.textContent=title;overlaySub.textCo
 function hideOverlay(){overlay.classList.add('hidden');shareScoreBtn.classList.add('hidden');}
 
 const _gameNames={snake:'Snake',tetris:'Tetris',fishy:'Fishy',breakout:'Breakout',pacman:'Pac-Man'};
+function _confirmCopied(){shareScoreBtn.textContent='Link copied!';setTimeout(()=>{shareScoreBtn.textContent='Share score →';},2000);}
+function _copyUrl(url){
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(_confirmCopied).catch(()=>_fallbackCopy(url));}
+  else{_fallbackCopy(url);}
+}
+function _fallbackCopy(url){
+  const ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');_confirmCopied();}catch{prompt('Copy this link:',url);}
+  document.body.removeChild(ta);
+}
 function showShareScore(game,score){
   shareScoreBtn.classList.remove('hidden');
-  shareScoreBtn.textContent='Score teilen →';
+  shareScoreBtn.textContent='Share score →';
   shareScoreBtn.onclick=e=>{
     e.stopPropagation();
     const url=`${location.origin}${location.pathname}?game=${game}&score=${score}`;
-    const text=`Kannst du mich schlagen? ${score} Punkte in ${_gameNames[game]}! ${url}`;
-    if(navigator.share){navigator.share({title:_gameNames[game],text,url});}
-    else{navigator.clipboard.writeText(url).then(()=>{shareScoreBtn.textContent='Link kopiert!';setTimeout(()=>{shareScoreBtn.textContent='Score teilen →';},2000)}).catch(()=>{prompt('Link kopieren:',url);});}
+    if(navigator.share){navigator.share({title:_gameNames[game],text:`Can you beat me? ${score} pts in ${_gameNames[game]}!`,url}).catch(()=>_copyUrl(url));}
+    else{_copyUrl(url);}
   };
 }
 
@@ -87,7 +97,7 @@ window.addEventListener('resize',()=>{
   if(activeGame==='pacman')   pacman.resize();
 });
 
-overlay.addEventListener('click', triggerStart);
+overlay.addEventListener('click', e=>{if(e.target!==shareScoreBtn)triggerStart();});
 document.addEventListener('keydown',e=>{
   if((e.key===' '||e.key==='Enter')&&!overlay.classList.contains('hidden')){e.preventDefault();triggerStart();}
 });
@@ -104,5 +114,5 @@ window.addEventListener('load',()=>{
   const game=p.get('game'),score=parseInt(p.get('score'));
   if(!game||!score||!['snake','tetris','fishy','breakout','pacman'].includes(game))return;
   const card=document.querySelector(`.card[data-game="${game}"]`);
-  if(card){card.click();showOverlay(`${score} Punkte in ${_gameNames[game]}!`,'Kannst du mich schlagen? — tippe zum Spielen');}
+  if(card){card.click();showOverlay(`${score} pts in ${_gameNames[game]}!`,'Can you beat me? — tap to play');}
 });
