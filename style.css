@@ -1,0 +1,258 @@
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      transition: opacity 0.25s;
+    }
+    .screen.hidden { opacity: 0; pointer-events: none; }
+
+    #screen-start {
+      gap: 0;
+    }
+    #screen-start .greeting {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      animation: fadeUp 0.5s ease both;
+    }
+    #screen-start h1 {
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+    #screen-start .tagline {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.7;
+      text-align: center;
+      max-width: 320px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+    .start-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+    .btn-primary {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 13px 30px;
+      font: inherit;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 2px;
+    }
+    .btn-primary:hover { opacity: 0.75; }
+    .btn-secondary {
+      background: none;
+      color: #999;
+      border: 1.5px solid #e8e8e8;
+      padding: 13px 24px;
+      font: inherit;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 2px;
+    }
+    .btn-secondary:hover { border-color: #bbb; color: #555; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hint { font-size: 0.78rem; color: #bbb; letter-spacing: 0.08em; }
+
+    #screen-menu h2 {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: #bbb;
+      letter-spacing: 0.12em;
+      text-transform: lowercase;
+    }
+    .cards { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .card {
+      width: 130px;
+      padding: 22px 18px;
+      border: 1.5px solid #111;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:hover, .card:active { background: #111; color: #fff; }
+    .card-title { font-size: 1.05rem; font-weight: 500; margin-bottom: 5px; }
+    .card-desc { font-size: 0.72rem; color: #888; line-height: 1.5; }
+    .card:hover .card-desc, .card:active .card-desc { color: #aaa; }
+
+    #screen-game {
+      justify-content: flex-start;
+      padding-top: 10px;
+      gap: 8px;
+    }
+    .game-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      padding: 0 10px;
+      min-height: 36px;
+      flex-shrink: 0;
+    }
+    #back-btn {
+      background: none; border: none;
+      font: inherit; font-size: 0.8rem;
+      color: #bbb; cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      padding: 4px 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #back-btn:hover { color: #111; }
+    .score-group { display: flex; gap: 18px; margin-left: auto; }
+    .score-item { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+    .score-label { font-size: 0.58rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.08em; }
+    .score-value { font-size: 0.88rem; font-weight: 500; }
+
+    #canvas-wrapper { position: relative; flex-shrink: 0; }
+    canvas { display: block; border: 1.5px solid #111; touch-action: none; }
+    #overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.93);
+      cursor: pointer;
+    }
+    #overlay.hidden { display: none; }
+    #overlay h2 { font-size: 1.25rem; font-weight: 500; }
+    #overlay p { font-size: 0.78rem; color: #888; text-align: center; line-height: 1.6; }
+    #share-score-btn {
+      margin-top: 6px;
+      background: #111; color: #fff;
+      border: none; border-radius: 2px;
+      padding: 8px 20px;
+      font: inherit; font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #share-score-btn:hover { opacity: 0.75; }
+    #share-score-btn.hidden { display: none; }
+
+    .controls { display: grid; gap: 6px; }
+    .controls.gone { display: none; }
+    .controls button {
+      background: #111; color: #fff;
+      border: none; border-radius: 6px;
+      width: 46px; height: 46px;
+      font-size: 1.05rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .controls button:active { background: #444; }
+    #controls-snake {
+      grid-template-columns: repeat(3, 46px);
+      grid-template-rows: repeat(2, 46px);
+    }
+    #controls-tetris {
+      grid-template-columns: repeat(3, 46px);
+      grid-template-rows: repeat(2, 46px);
+    }
+    @media (pointer: fine) { .controls { display: none !important; } }
+
+    /* === Draw toolbar === */
+    #draw-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 900px;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+    #draw-toolbar.gone { display: none; }
+    #draw-colors {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .draw-swatch {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .draw-swatch:hover { transform: scale(1.15); }
+    .draw-swatch.active { border-color: #111; transform: scale(1.15); }
+    .draw-swatch[data-color="#ffffff"] { border-color: #ddd; }
+    .draw-swatch[data-color="#ffffff"].active { border-color: #111; }
+    #draw-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .draw-size {
+      border-radius: 50%;
+      background: #111;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0;
+    }
+    .draw-size.active { border-color: #1e88e5; }
+    .draw-size[data-size="4"]  { width: 14px; height: 14px; }
+    .draw-size[data-size="10"] { width: 20px; height: 20px; }
+    .draw-size[data-size="22"] { width: 28px; height: 28px; }
+    .draw-size[data-size="40"] { width: 36px; height: 36px; }
+    .draw-sep { width: 1px; height: 28px; background: #eee; margin: 0 2px; }
+    #draw-actions button:not(.draw-size) {
+      background: #f5f5f5;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 6px;
+      width: 36px; height: 36px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+    }
+    #draw-actions button:not(.draw-size):hover { background: #ebebeb; }
+    #draw-actions button:not(.draw-size):active { background: #ddd; }
+    #draw-eraser.active { background: #111; color: #fff; border-color: #111; }
+    #draw-share { background: #111 !important; color: #fff; border-color: #111 !important; }

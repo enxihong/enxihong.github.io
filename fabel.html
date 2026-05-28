@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geschichten</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      min-height: 100%;
+      padding: 48px 20px 64px;
+    }
+
+    .page { max-width: 640px; margin: 0 auto; }
+
+    .back-link {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: #bbb;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      margin-bottom: 40px;
+    }
+    .back-link:hover { color: #111; }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 40px;
+    }
+
+    .topic-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .category-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-top: 24px;
+      margin-bottom: 2px;
+    }
+    .category-label:first-child { margin-top: 0; }
+
+    .topic-card {
+      width: 100%;
+      padding: 18px 22px;
+      border: 1.5px solid #111;
+      background: none;
+      color: #111;
+      font: inherit;
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      border-radius: 2px;
+    }
+    .topic-card:hover, .topic-card:active {
+      background: #111;
+      color: #fff;
+    }
+
+    /* Story view */
+    #view-story { display: none; }
+    #view-story.active { display: block; }
+    #view-topics.hidden { display: none; }
+
+    .story-back {
+      background: none;
+      border: none;
+      font: inherit;
+      font-size: 0.8rem;
+      color: #bbb;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      padding: 0;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .story-back:hover { color: #111; }
+
+    #story-title {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    #story-text {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #333;
+    }
+    #story-text p { margin-bottom: 1.1em; }
+    #story-text h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 1.8em 0 0.6em;
+    }
+    #story-text hr {
+      border: none;
+      border-top: 1.5px solid #eee;
+      margin: 1.8em 0;
+    }
+    #story-text ul { padding-left: 1.4em; margin-bottom: 1.1em; }
+    #story-text li { margin-bottom: 0.4em; }
+    #story-text h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 1.4em 0 0.5em;
+    }
+    #story-text ol { padding-left: 1.4em; margin-bottom: 1.1em; }
+    #story-text ol li { margin-bottom: 0.6em; }
+    #story-text table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.1em;
+      font-size: 0.88rem;
+    }
+    #story-text th, #story-text td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #story-text th { background: #f5f5f5; font-weight: 600; }
+    #story-text code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      background: #f0f0f0;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    #story-text pre {
+      background: #f8f8f8;
+      border: 1px solid #e4e4e4;
+      border-radius: 4px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      margin-bottom: 1.1em;
+      line-height: 1.6;
+    }
+    #story-text pre code { background: none; padding: 0; border-radius: 0; }
+    #story-text blockquote {
+      border-left: 3px solid #ddd;
+      margin: 1em 0;
+      padding: 4px 16px;
+      color: #555;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate { animation: fadeUp 0.3s ease both; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div id="view-topics">
+    <a class="back-link" href="index.html">← zurück</a>
+    <h1>Geschichten</h1>
+    <p class="subtitle">Wähle eine Geschichte</p>
+    <div class="topic-grid" id="topic-grid"></div>
+  </div>
+
+  <div id="view-story">
+    <button class="story-back" id="story-back-btn">← alle Themen</button>
+    <h2 id="story-title"></h2>
+    <div id="story-text"></div>
+  </div>
+
+</div>
+
+<script>
+  function renderMd(md) {
+    const blocks = md.trim().split(/\n\n+/);
+    return blocks.map(block => {
+      const t = block.trim();
+      if (/^-{3,}$/.test(t)) return '<hr>';
+      if (t.startsWith('```')) {
+        const code = t.replace(/^```\w*\n?/, '').replace(/\n?```$/, '');
+        const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<pre><code>' + esc + '</code></pre>';
+      }
+      if (t.startsWith('> '))  return '<blockquote>' + inl(t.slice(2)) + '</blockquote>';
+      if (t.startsWith('### ')) return '<h3>' + inl(t.slice(4)) + '</h3>';
+      if (t.startsWith('## ')) return '<h2>' + inl(t.slice(3)) + '</h2>';
+      const lines = t.split('\n');
+      if (lines.every(l => l.trim().startsWith('- '))) {
+        return '<ul>' + lines.map(l => '<li>' + inl(l.trim().slice(2)) + '</li>').join('') + '</ul>';
+      }
+      if (lines.every(l => /^\d+\. /.test(l.trim()))) {
+        return '<ol>' + lines.map(l => '<li>' + inl(l.trim().replace(/^\d+\. /, '')) + '</li>').join('') + '</ol>';
+      }
+      if (lines.every(l => l.trim().startsWith('|'))) {
+        const rows = lines.filter(l => !/^\|[\s\-|]+$/.test(l.trim()));
+        const [header, ...body] = rows;
+        const cells = row => row.trim().replace(/^\||\|$/g, '').split('|').map(c => inl(c.trim()));
+        const ths = cells(header).map(c => '<th>' + c + '</th>').join('');
+        const trs = body.map(r => '<tr>' + cells(r).map(c => '<td>' + c + '</td>').join('') + '</tr>').join('');
+        return '<table><thead><tr>' + ths + '</tr></thead><tbody>' + trs + '</tbody></table>';
+      }
+      return '<p>' + inl(lines.join(' ')) + '</p>';
+    }).join('');
+  }
+
+  function inl(s) {
+    return s
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  }
+
+  const stories = {
+    rdd: {
+      title: "Regression Discontinuity Design",
+      md: `## Die Brücke von Montaverde
+
+Der alte Umberto Casale hatte sein Leben lang Weinreben gepflanzt. Sein Bruder Enzo auch. Beide Männer stammten aus demselben Tal, tranken denselben Brunnen leer, lernten bei demselben Vater das Pfropfen. Und doch: Umbertos Wein wurde berühmt. Enzos Wein blieb mittelmäßig.
+
+Die Leute im Dorf sagten, Umberto habe einfach mehr Talent. Vielleicht. Aber niemand fragte genauer nach.
+
+Ich fragte nach.
+
+Es stellte sich heraus, dass das Tal vor dreißig Jahren durch einen Fluss geteilt worden war — unscheinbar, kaum dreißig Meter breit. Die Regionalregierung hatte damals ein Förderprogramm aufgelegt: Winzer auf der westlichen Seite des Flusses erhielten Beratung, neue Gerätschaften, subventionierte Anbaukurse. Die östliche Seite: nichts. Die Grenze war nicht nach Bodenbeschaffenheit gezogen worden, nicht nach Qualität der Reben, nicht nach Talent der Bauern. Sie war administrativ festgelegt worden — nach einem alten Katasterplan, der selbst eine Kuriosität der Geschichte war.
+
+Umberto wohnte westwärts. Enzo ostwärts. Umberto lag sieben Meter jenseits der Grenzlinie.
+
+Sieben Meter.
+
+Ich begann, Daten zu sammeln. Alle Winzer im Umkreis von zwei Kilometern um den Fluss. Je näher zwei Betriebe an der Grenzlinie lagen — einer links, einer rechts —, desto ähnlicher waren sie in allem: Bodengüte, Niederschlag, Erfahrung, Betriebsgröße. Und doch: auf der Westseite, Jahr für Jahr, bessere Erträge, höhere Qualität, wachsende Bekanntheit.
+
+Am Fluss selbst war der Unterschied scharf wie ein Schnitt.
+
+Da verstand ich: Nicht Umbertos Talent hatte ihn von Enzo getrennt. Es war eine Linie auf einer alten Karte.
+
+---
+
+## Das Konzept: Regression Discontinuity Design (RDD)
+
+**RDD** nutzt eine künstliche Schwelle — eine Fördergrenze, eine Prüfungsnote, ein Geburtsdatum — als natürliches Experiment. Die Grundidee: Einheiten, die knapp ober- oder unterhalb dieser Grenze liegen, sind im Durchschnitt nahezu identisch. Wer beispielsweise mit 59 Punkten nicht gefördert wird, ist kaum anders als jemand mit 61 Punkten, der Förderung erhält.
+
+Dieser scharfe Sprung in der Behandlung bei kontinuierlichen Hintergrundmerkmalen erlaubt einen kausalen Schluss: Ein beobachteter Sprung im Ergebnis direkt an der Schwelle kann kausal auf die Intervention zurückgeführt werden — nicht auf vorher bestehende Unterschiede.
+
+**Zwei Varianten:**
+
+- **Sharp RDD**: Alle, die die Schwelle überschreiten, erhalten die Behandlung — wie im Fall von Umberto und Enzo.
+- **Fuzzy RDD**: Die Wahrscheinlichkeit der Behandlung steigt an der Schwelle stark an, aber nicht auf 100 % (z. B. weil manche Berechtigten das Angebot ablehnen). Hier verwendet man die Schwelle als Instrument.
+
+**Die entscheidende Annahme**: Individuen können ihre Zugehörigkeit zur behandelten Gruppe nicht gezielt manipulieren. Wenn Winzer ihre Grundstücke nicht verschieben können, ist die Zuteilung nahe der Grenze quasi-zufällig — und damit glaubwürdig exogen.
+
+RDD ist besonders wertvoll, weil er kausal argumentiert, ohne eine randomisierte Studie zu erfordern. Er nutzt, was die Welt ohnehin produziert: willkürliche Grenzen. Und macht daraus Wissen.`
+    },
+    iv: {
+      title: "Instrumental Variable",
+      md: `## Die Kaffeepause
+
+Dr. Mira Voss lehnte sich in ihrem Bürostuhl zurück und starrte auf die zwei Stapel Akten auf ihrem Schreibtisch. Draußen regnete es, und der Geruch von frischem Kaffee zog durch das Krankenhaus der Universitätsklinik München.
+
+Sie war Kardiologin, aber seit drei Jahren beschäftigte sie sich hauptsächlich mit einer einzigen Frage: *Warum sterben manche Patienten mit Herzinsuffizienz trotz optimaler Behandlung früher?*
+
+Ihr Kollege Jonas kam herein, Kaffeebecher in der Hand.
+
+„Ich hab deine Auswertung gesehen", sagte er und setzte sich. „Beeindruckend. Patienten, die regelmäßig zur Kontrolluntersuchung kommen, leben im Schnitt zwei Jahre länger."
+
+„Ich weiß", sagte Mira. Aber sie klang nicht erfreut.
+
+„Du glaubst nicht daran?"
+
+Sie schüttelte den Kopf. „Ich glaube den Zahlen. Ich glaube nur nicht, dass wir verstehen, *warum*."
+
+---
+
+Jonas runzelte die Stirn. „Was gibt es da nicht zu verstehen? Wer zur Kontrolle kommt, bekommt rechtzeitig Anpassungen in der Medikation, wird besser überwacht. Natürlich leben diese Patienten länger."
+
+„Oder", sagte Mira, „wer zur Kontrolle kommt, ist sowieso jemand, der sich besser um sich selbst kümmert. Der auch die Medikamente regelmäßig nimmt. Der weniger raucht. Der Familie hat, die ihn erinnert."
+
+Jonas schwieg.
+
+„Unsere Daten", fuhr sie fort, „können das nicht auseinanderhalten. Wir sehen nur: Kontrolluntersuchung → längeres Leben. Aber wir wissen nicht, ob die Untersuchung selbst irgendetwas bewirkt — oder ob wir einfach die disziplinierteren, gesünderen Patienten beobachten."
+
+„Also müssten wir…" Jonas überlegte. „…eine randomisierte Studie machen. Zufällig zuweisen, wer kommt."
+
+„Genau. Und das", sagte Mira, „können wir ethisch nicht verantworten."
+
+---
+
+Wochen vergingen. Mira grübelte.
+
+Dann fiel ihr die Baustelle ein.
+
+Vor zwei Jahren hatte eine Straßensperrung rund um die Klinik dazu geführt, dass manche Patienten aus dem westlichen Stadtgebiet ihre Termine spontan absagen mussten — für fast vier Monate. Nicht weil sie wollten. Nicht weil sie kränker waren oder gesünder. Einfach, weil die Straße gesperrt war.
+
+Sie rief das Archiv an.
+
+---
+
+Drei Wochen später saß sie mit einem Berg Patientendaten vor sich.
+
+Sie teilte die Patienten auf: jene, die während der Sperrung im westlichen Einzugsgebiet wohnten, und jene, die ungehindert die Klinik erreichen konnten. Dann verglich sie — nicht direkt ihre Überlebenszeiten, sondern zunächst die Besuchshäufigkeit. Tatsächlich: Die Westpatienten hatten während dieser vier Monate deutlich weniger Kontrolltermine wahrgenommen.
+
+Und jetzt die entscheidende Frage: Wie war ihr weiteres Überleben?
+
+Mira tippte die letzten Parameter in ihr Modell.
+
+Das Ergebnis erschien auf dem Bildschirm.
+
+Sie lehnte sich zurück.
+
+Der Unterschied im Überleben zwischen den beiden Gruppen war… fast nicht vorhanden.
+
+---
+
+Jonas kam am nächsten Morgen wieder mit Kaffee. Mira hatte die Nacht durchgearbeitet.
+
+„Und?", fragte er.
+
+„Die Baustelle", sagte sie, „hat uns ein Experiment geschenkt, das wir nie hätten geplant bekommen. Zufällig. Ohne jemanden zu benachteiligen. Niemand wurde *ausgewählt*, weniger zu kommen — es war einfach die Straße."
+
+Jonas sah auf die Grafiken. „Das heißt… die Untersuchungen selbst verlängern das Leben vielleicht gar nicht so stark, wie wir dachten?"
+
+„Oder zumindest nicht so, wie unsere ursprünglichen Zahlen suggerierten. Der Effekt in unseren Daten vorher war zu einem guten Teil kein Effekt der Behandlung — er war ein Echo der Patienten selbst. Ihrer Eigenschaften, die wir nie gemessen haben."
+
+Jonas stellte seinen Becher ab. „Und die Baustelle hat das ausgelöscht."
+
+„Die Baustelle", sagte Mira leise, „hat uns von diesen Eigenschaften befreit. Sie hat uns gezwungen zu sehen, was wirklich wirkt — und was wir uns nur eingeredet haben."
+
+---
+
+Sie schaute aus dem Fenster. Der Regen hatte aufgehört. Irgendwo in der Stadt reparierte jemand eine Straße, und Mira dachte daran, wie viel Wahrheit manchmal in den Zufällen steckt, die uns das Leben aufzwingt — und wie selten wir sie erkennen.
+
+---
+
+## Das Konzept: Instrumental Variable (IV)
+
+Was Mira in der Geschichte intuitiv entdeckt, ist eine der elegantesten Methoden der Kausalinferenz: die **Instrumentalvariable** (*Instrumental Variable, IV*).
+
+### Das Grundproblem: Konfundierung
+
+Wenn wir beobachten, dass Patienten mit häufigen Kontrolluntersuchungen länger leben, können wir nicht einfach schlussfolgern, dass die Untersuchungen die Ursache sind. Es gibt **nicht gemessene, gemeinsame Ursachen** (Confounder) — etwa die allgemeine Disziplin oder das soziale Umfeld einer Person —, die sowohl die Besuchshäufigkeit als auch das Überleben beeinflussen. Klassische Regressionen oder Matching-Verfahren können diese **unbeobachteten Confounder** nicht beseitigen.
+
+### Die Lösung: Ein Instrument
+
+Eine Instrumentalvariable *Z* ist eine Variable, die drei Bedingungen erfüllt:
+
+| Bedingung | Bedeutung | Im Beispiel |
+|---|---|---|
+| **Relevanz** | Z beeinflusst die Behandlung X | Die Baustelle reduziert tatsächlich die Besuchshäufigkeit |
+| **Exogenität** | Z ist unabhängig von den Confoundern | Die Straßensperrung hat nichts mit der Gesundheitsmotivation der Patienten zu tun |
+| **Ausschlussbeschränkung** | Z beeinflusst das Outcome Y *nur* durch X | Die Baustelle beeinflusst das Überleben *ausschließlich* über weniger Arztbesuche — nicht direkt |
+
+Die Baustelle erfüllt alle drei: Sie ist zufällig entstanden, von den Patienteneigenschaften unabhängig, und hat keinen direkten Einfluss auf das Herz — nur auf die Terminhäufigkeit.
+
+### Die Schätzung: Two-Stage Least Squares (2SLS)
+
+In der Praxis verwendet man häufig das **Zwei-Stufen-Verfahren**:
+
+1. **Erste Stufe:** Schätze die Behandlung X (Besuchshäufigkeit) als Funktion des Instruments Z (Baustelle ja/nein) — extrahiere so den „exogenen", zufälligen Teil der Variation in X.
+2. **Zweite Stufe:** Schätze den Effekt dieser bereinigten Behandlung auf das Outcome Y (Überleben).
+
+Weil in Stufe 1 alle patientenseitigen Einflüsse herausgefiltert wurden, ist der in Stufe 2 geschätzte Koeffizient kausal interpretierbar — zumindest für jene Patienten, deren Verhalten das Instrument tatsächlich verändert hat.
+
+### Was IV schätzt: LATE
+
+Ein wichtiger Punkt für Master-Niveau: IV schätzt nicht den durchschnittlichen Behandlungseffekt für alle (*ATE*), sondern den **Local Average Treatment Effect (LATE)** — den Effekt für die sogenannten **Compliers**, also jene Patienten, die wegen der Baustelle tatsächlich seltener kamen und ihr Verhalten geändert hätten. Patienten, die so oder so kämen (Always-Takers) oder nie kämen (Never-Takers), fließen nicht in die Schätzung ein.
+
+### Warum ist das mächtig?
+
+IV erlaubt kausale Schätzung **ohne randomisiertes Experiment** — indem natürliche oder institutionelle Zufälle (*natural experiments*) genutzt werden. Klassische Beispiele in der Forschung sind: Geburtsmonat als Instrument für Bildungsjahre, Kriegslotterie als Instrument für Militärdienst, oder Entfernung zum nächsten Krankenhaus als Instrument für Behandlungsintensität.
+
+Die Methode zeigt: Manchmal steckt die größte Erkenntnis nicht im sorgfältig geplanten Experiment — sondern in der Baustelle, die jemand vergessen hat zu melden.`
+    },
+    harness: {
+      title: "Agentenevaluation",
+      md: `## Die stille Prüferin
+
+Der alte Uhrmacher Teodor saß jeden Tag an seinem Tisch und reparierte Uhren – nicht für Geld, sondern weil er wissen wollte, *ob sie liefen*. Doch Teodor hatte ein Problem: Er konnte die Zeit selbst nicht messen. Keine seiner Referenzuhren war zuverlässig. Manche gingen vor, manche nach, und keine zeigte exakt das Gleiche.
+
+Also baute er sich etwas. Eine Vorrichtung – er nannte sie schlicht „die Prüferin". Sie hielt eine Uhr fest, spannte die Feder auf genau 40 Umdrehungen, öffnete die Hemmung für exakt einhundert Takte, und stoppte dann. Sie stellte immer dieselben Bedingungen her, ganz gleich, wer die Uhr einlegte, und ganz gleich, an welchem Morgen.
+
+Die Prüferin urteilte nicht. Sie fragte nicht, wie die Uhr hieß oder wer sie gebaut hatte. Sie kümmerte sich nicht darum, ob der Uhrmacher müde war. Sie wiederholte einfach denselben Handgriff, immer wieder, und notierte das Ergebnis in einem Buch.
+
+Bald bemerkte Teodor etwas Seltsames. Manche Uhren liefen in der Prüferin tadellos – und versagten trotzdem im Alltag. Andere wirkten grob und ungenau, schlugen sich draußen aber hervorragend. Die Prüferin zeigte ihm, was die Uhr *unter kontrollierten Bedingungen* tat. Was sie nicht zeigte, war, was die Uhr *in der Welt* tat.
+
+Das verwirrte ihn lange. Bis er verstand: Die Prüferin war kein Spiegel der Wirklichkeit. Sie war ein *Werkzeug zur Vergleichbarkeit*. Dank ihr konnte er zwei Uhren nebeneinander halten und sagen: „Diese hier ist unter denselben Bedingungen besser als jene." Ohne sie hätte er Äpfel mit Birnen verglichen – mal windig, mal still, mal mit müden Händen, mal mit frischen.
+
+Er baute noch mehr Prüferinnen. Für Ganggenauigkeit. Für Stoßfestigkeit. Für Kälte. Jede testete etwas anderes, immer reproduzierbar, immer ohne Gunst.
+
+Und so wurde Teodor nicht zum besten Uhrmacher, weil er die meiste Erfahrung hatte —
+
+sondern weil er *wusste, was er wirklich maß*.
+
+---
+
+## Das Konzept: Agentenevaluation
+
+**Was ist ein Evaluation Harness?**
+
+In der KI-Forschung – besonders beim Testen von autonomen Agenten (z. B. LLM-basierten Systemen) – ist ein *Evaluation Harness* eine kontrollierte Testumgebung, die einen Agenten systematisch und reproduzierbar bewertet. Genau wie Teodors Prüferin stellt sie immer dieselben Bedingungen her, unabhängig vom Tester.
+
+**Isolation & Reproduzierbarkeit** — Der Agent wird in einer definierten Umgebung ausgeführt. Externe Variablen (Netzwerk, Zufall, Kontext) werden kontrolliert oder fixiert, damit zwei Läufe vergleichbar sind.
+
+**Aufgaben-Design (Task Suite)** — Das Harness enthält eine kuratierte Menge von Aufgaben, die verschiedene Fähigkeiten abdecken: Reasoning, Tool-Use, Fehlerkorrektur, Mehrschrittigkeit. Wie Teodors verschiedene Prüferinnen für Kälte oder Stoß.
+
+**Metriken vs. Proxy-Metriken** — Ein zentrales Problem: Was gemessen wird, ist oft nicht das, was eigentlich zählt. Ein Agent kann einen Benchmark „bestehen" und im echten Einsatz scheitern – genau wie Teodors Uhren, die in der Prüferin gut liefen, draußen aber versagten. Forscher nennen das *Goodhart's Law* oder *Benchmark Overfitting*.
+
+**Blind Evaluation & Bias-Kontrolle** — Das Harness urteilt mechanisch, nicht subjektiv. Dadurch werden menschliche Erwartungen, Reihenfolge-Effekte und Confirmation Bias eliminiert.
+
+**Die offene Frage** — Kein Harness ist vollständig. Die eigentliche Kunst liegt darin, Aufgaben zu entwerfen, die *valide* sind: die das messen, was im echten Einsatz relevant ist — und nicht nur das, was leicht zu messen ist.`
+    },
+    window_fn: {
+      title: "Window Functions in SQL",
+      md: `## Die Frau am Fenster
+
+Die Bibliothek öffnete jeden Morgen um acht Uhr, und jeden Morgen saß Marta bereits drinnen — an ihrem Stammplatz, dem langen Tisch am Fenster im zweiten Stock.
+
+Sie beobachtete die anderen. Das war ihre stille Leidenschaft.
+
+Den alten Herrn mit dem Hut, der immer als Erster ankam und sich Sessel Nummer drei sicherte. Die Studentin mit den roten Turnschuhen, die täglich eine neue Thermosflasche mitbrachte. Den Mann mittleren Alters, der nie ein Buch aufschlug, aber stundenlang ins Leere starrte.
+
+Marta machte sich Notizen. Nicht über einzelne Personen — sondern über Muster.
+
+Sie notierte: *Wer kommt täglich früher als der Vortag?* Sie betrachtete jeden Besucher nicht isoliert, sondern immer im Verhältnis zu allen anderen und zur eigenen Geschichte. Der alte Herr mit dem Hut hatte sich letzte Woche dreimal verspätet — aber seine Drei-Wochen-Bilanz war makellos.
+
+Das Entscheidende war: Marta verließ niemanden aus ihrer Betrachtung. Wenn sie über die Studentin nachdachte, blieb die gesamte Gruppe sichtbar. Die Studentin existierte *innerhalb* der Gemeinschaft, nicht herausgeschnitten aus ihr.
+
+Eines Tages fragte ein junger Bibliothekar, was sie da eigentlich tue.
+
+„Ich teile nicht auf", sagte Marta. „Die meisten Menschen, wenn sie etwas verstehen wollen, nehmen einen heraus und schauen ihn allein an. Ich behalte den Rahmen. Ich berechne, wo jemand steht — aber ohne die Gruppe zu zerstören."
+
+Der Bibliothekar runzelte die Stirn. „Wie eine... Rangliste, die die Tabelle nicht verändert?"
+
+Marta lächelte. „Genau. Ich schiebe ein Fenster über die Zeit. Ich sehe den Einzelnen — und trotzdem alle."
+
+---
+
+## Das Konzept: Window Functions in SQL
+
+**Window Functions** (analytische Funktionen) berechnen Werte über eine Menge von Zeilen — das sogenannte *Fenster* — ohne die zugrundeliegende Tabelle zu aggregieren oder Zeilen zu entfernen.
+
+Im Gegensatz zu \`GROUP BY\`, das Zeilen zu einer einzigen Ergebniszeile zusammenfasst, bleibt bei Window Functions jede Zeile erhalten. Der berechnete Wert bezieht sich jedoch auf den definierten Rahmen (Partition + Sortierung + Frame).
+
+**Grundstruktur:**
+
+\`\`\`sql
+SELECT
+  name,
+  besuche,
+  RANK() OVER (PARTITION BY kategorie ORDER BY besuche DESC) AS rang,
+  AVG(besuche) OVER (PARTITION BY kategorie) AS durchschnitt
+FROM besucher;
+\`\`\`
+
+**Schlüsselkomponenten:**
+
+- **\`OVER()\`** — aktiviert die Window Function; ohne sie wäre es eine normale Aggregation
+- **\`PARTITION BY\`** — teilt die Daten in logische Gruppen (wie Martas „Fenster" über Besuchertypen)
+- **\`ORDER BY\`** (innerhalb von OVER) — definiert die Reihenfolge für Rankings oder Laufwerte
+- **\`ROWS/RANGE BETWEEN\`** — steuert den genauen Frame, z. B. gleitende Durchschnitte der letzten 7 Tage
+
+**Typische Anwendungsfälle:**
+
+| Funktion | Verwendung |
+|---|---|
+| \`ROW_NUMBER()\` | Eindeutige Zeilennummerierung pro Partition |
+| \`RANK()\` / \`DENSE_RANK()\` | Rankings mit/ohne Lücken bei Gleichstand |
+| \`LAG()\` / \`LEAD()\` | Zugriff auf Vorgänger-/Nachfolgezeilen |
+| \`SUM() OVER (... ROWS BETWEEN ...)\` | Gleitende Summen / kumulative Werte |
+| \`NTILE(n)\` | Einteilung in n gleichgroße Quantilgruppen |
+
+**Warum es wichtig ist:** Window Functions ersetzen oft komplexe Self-Joins oder Subqueries und sind für Zeitreihenanalysen, Kohortenstudien und Performance-Rankings in großen Datensätzen unverzichtbar. Sie laufen effizienter als äquivalente Subqueries und sind in allen modernen SQL-Dialekten (PostgreSQL, BigQuery, Snowflake, Spark SQL) verfügbar.
+
+Marta hätte es so gesagt: *Man verlässt niemanden aus dem Blick — aber man rechnet trotzdem.*`
+    },
+    topology: {
+      title: "Leitungssatz-Topologie",
+      md: `## Die Dirigentin
+
+Es war ihr letztes Konzert vor der Rente, und niemand im Saal wusste, dass das Orchester kurz vor dem Kollaps stand.
+
+Luisa hatte dreißig Jahre lang dasselbe Prinzip verfolgt: Jeder Musiker war mit ihr verbunden, aber nicht auf dieselbe Weise. Die ersten Geigen liefen direkt zu ihr – kurze, dicke Linien der Autorität. Die Schlagzeuger hingegen erreichte sie über die Konzertmeisterin, die wiederum über den ersten Bratschisten lief. Wege, die sich verzweigten und bündelten wie Äste eines Baumes, der im Rücken der Bühne unsichtbar wuchs.
+
+Heute Abend fehlte der zweite Oboist. Kein Problem, dachte das Publikum. Ein Sitz blieb leer.
+
+Aber Luisa wusste, dass der zweite Oboist auch die Noten für den dritten Hornisten weitergereicht hatte. Und der dritte Hornist war der einzige Mensch, der in der Pause den Flötistinnen das Tempowechsel-Signal gab. Ohne dieses Signal würden die Flötistinnen im zweiten Satz um vier Takte zu früh einsetzen. Und die Flötistinnen – das hatte die Generalprobe gezeigt – rissen die Streicher mit sich.
+
+Ein fehlender Musiker. Vier Takte Versatz. Achtzehn Instrumente außer Kontrolle.
+
+Sie hatte die Abende damit verbracht, Karten zu zeichnen. Wer gibt wem ein Zeichen? Welcher Pfad trägt wie viel Last? Wo bricht das System, wenn ein Knoten ausfällt? Sie nannte es ihre „stille Architektur" – das Unsichtbare, das alles zusammenhält.
+
+Heute Abend hatte sie den Pfad umgeleitet. Die Konzertmeisterin würde das Tempowechsel-Signal direkt übernehmen. Ein neuer Ast, provisorisch, aber stark genug.
+
+Der erste Takt erklang. Makellos.
+
+Hinterher sagte jemand: „Großartige Leistung. Alles lief wie am Schnürchen."
+
+Luisa lächelte. *Wie am Schnürchen.* Wenn sie nur wüssten.
+
+---
+
+## Das Konzept: Leitungssatz-Topologie und Lastpfadanalyse
+
+Im **Harness Engineering** bezeichnet die **Topologie** eines Kabelbaums die strukturelle Anordnung aller elektrischen Verbindungen: Wer ist mit wem verbunden? Über welche Wege fließt Strom? Wo gibt es Verteilerknoten (Splices, Connector Hubs), und welche Leitungen tragen wie viel Last?
+
+Die **Lastpfadanalyse** geht einen Schritt weiter: Sie untersucht, welche Konsequenzen entstehen, wenn ein Pfad ausfällt – durch Leitungsbruch, Steckerfehler oder Überlast. Kritische Fragen sind dabei:
+
+- **Propagation**: Führt ein lokaler Fehler zu einem systemweiten Ausfall?
+- **Redundanz**: Gibt es alternative Strompfade (parallele Leitungen, Bypass-Routen)?
+- **Derating**: Ist jede Leitung für die tatsächlich fließende Last ausgelegt – inklusive aller Lastfälle und Toleranzen?
+
+Im Fahrzeug- und Luftfahrtbereich ist diese Analyse sicherheitskritisch: Ein falsch dimensionierter Splice, der mehrere Verbraucher versorgt, kann bei Überlast thermisch versagen und kaskadenartige Ausfälle auslösen – genau wie Luisas fehlender Oboist, der über mehrere Zwischenglieder das gesamte Orchester destabilisierte.
+
+Das Ziel guten Harness Engineerings ist deshalb: **Topologien entwerfen, die robust gegenüber Einzelausfällen sind** – durch bewusste Pfadplanung, Schutzschalterkoordination und durchdachte Redundanzarchitektur.`
+    },
+    russell: {
+      title: "Russells Paradoxon",
+      md: `## Die Hüterin der Grenzen
+
+In einer Stadt lebte eine Frau namens Vera, die als Archivarin arbeitete. Ihr Archiv war kein gewöhnliches — es enthielt keine Bücher, sondern **Mengen**: Körbe voller Dinge, Schachteln in Schachteln, Zimmer voller Zimmer.
+
+Eines Morgens brachte ihr ein junger Mann einen Korb und sagte: „Vera, ich habe alle Körbe der Stadt gesammelt — jeden einzelnen, der sich *nicht selbst enthält*."
+
+Vera betrachtete den Korb. Er war leer, aber das störte sie nicht. Seltsam war etwas anderes.
+
+„Enthält dein Korb sich selbst?", fragte sie ruhig.
+
+Der junge Mann lachte. „Natürlich nicht. Also gehört er zu den Körben, die sich nicht selbst enthalten — und deshalb *ist* er ja auch darin."
+
+Vera schwieg.
+
+„Aber warte", fuhr er fort, langsamer jetzt. „Wenn er *in sich selbst* ist… dann enthält er sich selbst. Und dann dürfte er gar nicht darin sein. Dann müsste er *heraus*." Er griff in den Korb, zog ihn heraus — und hielt ihn in der Hand. „Aber jetzt enthält er sich wieder nicht, also *muss* er hinein."
+
+Er legte ihn wieder hinein.
+
+Heraus. Hinein. Heraus. Hinein.
+
+Der junge Mann sah Vera an. Sie lächelte nicht, aber ihre Augen waren wach.
+
+„Was ist das?", flüsterte er.
+
+„Ein Widerspruch", sagte sie. „Aber kein gewöhnlicher. Dein Korb ist nicht falsch gebaut — die *Frage* ist falsch gestellt. Du hast eine Menge erschaffen, die sich selbst definieren soll, ob sie sich enthält. Und das kann sie nicht. Sie zerfällt in dem Moment, in dem sie es versucht."
+
+Der junge Mann setzte sich. Lange sagte er nichts.
+
+„Dann kann man nicht einfach *alle* Mengen sammeln?"
+
+„Nein", antwortete Vera. „Manche Sammlungen darf man nicht bilden. Nicht weil es verboten ist — sondern weil die Logik selbst zusammenbricht."
+
+---
+
+## Das Konzept: Russells Paradoxon
+
+**Bertrand Russell** entdeckte 1901 einen fundamentalen Widerspruch in der naiven Mengenlehre.
+
+Die **naive Mengenlehre** erlaubte jede beliebige Eigenschaft, um eine Menge zu definieren — also auch: *„Die Menge aller Mengen, die sich nicht selbst enthalten"*, formal: **R = { x | x ∉ x }**.
+
+Die Frage lautet dann: Gilt R ∈ R?
+
+- Wenn **R ∈ R**, dann erfüllt R die definierende Eigenschaft nicht — also müsste R ∉ R gelten. Widerspruch.
+- Wenn **R ∉ R**, dann erfüllt R die Eigenschaft — also müsste R ∈ R gelten. Widerspruch.
+
+Das Paradoxon zeigte, dass die naive Mengenlehre (Freges System) in sich **inkonsistent** ist. Es war kein Randproblem — es traf das Fundament der Mathematik.
+
+Die Reaktion war tiefgreifend: Ernst Zermelo und Abraham Fraenkel entwickelten die **axiomatische Mengenlehre (ZF/ZFC)**, die das unkontrollierte Bilden von Mengen einschränkt. Das **Aussonderungsaxiom** erlaubt nur noch, Teilmengen aus bereits existierenden Mengen auszusondern — eine „Menge aller Mengen" darf gar nicht erst entstehen.
+
+Russells Paradoxon markiert damit den Übergang von der intuitiven zur streng axiomatischen Mathematik — eine der wichtigsten Zäsuren des 20. Jahrhunderts.`
+    },
+    turing: {
+      title: "Unentscheidbarkeit",
+      md: `## Der Mann, der nie aufhört zu fragen
+
+Der Philosoph Kael hatte eine Eigenheit: Er beantwortete keine Frage direkt. Stattdessen verwandelte er jede Frage in eine andere — präziser, schärfer, tiefer.
+
+Eines Tages kam eine Studentin zu ihm. „Kael", sagte sie, „ich habe ein Problem, das ich nicht lösen kann."
+
+„Gut", sagte er. „Beschreib es mir."
+
+Sie erklärte es. Kael hörte zu, nickte — und formulierte ein neues, einfacheres Problem. „Kannst du *das* lösen?"
+
+Sie dachte nach. „Ja."
+
+„Dann hast du auch deins gelöst", sagte er. „Denn deins ist im Grunde dasselbe."
+
+Die Studentin war beeindruckt. Wochen vergingen. Sie kam mit schwereren Problemen. Kael verwandelte sie immer — in bekannte Formen, in gelöste Fälle, in Fragen, auf die die Antwort bereits irgendwo stand.
+
+Dann, eines Abends, kam sie mit einem anderen Gesicht. Nicht fragend — triumphierend.
+
+„Kael. Ich habe *dein* Problem."
+
+Er sah auf.
+
+„Ich frage dich: Wirst du diese Frage jemals beantworten?" Sie lächelte. „Wenn ja — beantworte sie jetzt. Wenn nein — dann hast du sie gerade beantwortet. Du kannst nicht entkommen."
+
+Kael lehnte sich zurück.
+
+„Darf ich sie umformulieren?"
+
+„Natürlich. Das ist deine Methode."
+
+Er dachte lange nach. Dann sagte er leise: „Ich kann deine Frage nicht in eine einfachere verwandeln. Nicht weil sie zu schwer ist — sondern weil sie sich selbst im Weg steht. Jede Umformulierung führt zurück zu ihr. Sie hat keinen Boden."
+
+Die Studentin setzte sich. Die Stille zwischen ihnen war anders als sonst.
+
+„Es gibt also Fragen", sagte sie langsam, „die deine Methode nicht lösen kann — nicht einmal prinzipiell?"
+
+„Ja", sagte Kael. „Und das Merkwürdige ist: Ich kann dir sogar *beweisen*, dass es sie gibt. Ich kann dir nur nicht sagen, welche es sind — bevor du sie mir bringst."
+
+Er sah aus dem Fenster.
+
+„Manche Probleme erkennt man erst als unlösbar, wenn man zu lange vor ihnen steht."
+
+---
+
+## Das Konzept: Unentscheidbarkeit und das Halteproblem (Turing, 1936)
+
+**Alan Turing** zeigte 1936, dass es fundamentale Grenzen der Berechenbarkeit gibt — Probleme, die kein Algorithmus jemals lösen kann, egal wie leistungsfähig der Computer ist.
+
+Das bekannteste Beispiel ist das **Halteproblem**: Gegeben ein beliebiges Programm P und eine Eingabe E — wird P bei Eingabe E irgendwann *anhalten*, oder läuft es ewig?
+
+Turings Beweis ist ein **Diagonalargument** — elegant und vernichtend:
+
+Angenommen, es gäbe ein Programm H(P, E), das für jedes P und E korrekt entscheidet: *„hält"* oder *„hält nicht"*. Dann konstruiert man ein neues Programm D, das H als Unterprogramm benutzt und sich selbst als Eingabe übergibt:
+
+- Wenn H sagt, D würde halten → dann läuft D absichtlich ewig.
+- Wenn H sagt, D würde nicht halten → dann hält D sofort an.
+
+Was passiert, wenn man D mit sich selbst aufruft? H kann keine konsistente Antwort liefern — ein direkter Widerspruch. Also kann H nicht existieren.
+
+Das Halteproblem ist damit **unentscheidbar** — nicht nur schwer, sondern prinzipiell außerhalb jeder algorithmischen Reichweite.
+
+Die Konsequenzen sind tiefgreifend: Compiler können nicht allgemein prüfen, ob Code terminiert. Viren können nicht vollständig automatisch erkannt werden. Softwareverifikation hat unüberwindbare Grenzen. Turings Ergebnis definiert nicht, was Computer *heute* nicht können — sondern was sie **niemals** können werden.`
+    },
+    overfitting: {
+      title: "Overfitting",
+      md: `## Der Detektiv, der zu gut wurde
+
+Inspektor Maren galt als die beste Ermittlerin der Stadt. Zwölf Jahre Erfahrung, hunderte gelöste Fälle. Ihr Gedächtnis war legendär: Sie erinnerte sich an jeden Verdächtigen, jeden Tick, jede Lüge — und erkannte Muster, wo andere nur Zufall sahen.
+
+Dann kam der Mordfall in der Hafenstraße.
+
+Der Verdächtige hieß Tomás. Klein, nervöser Blick, zitterte beim Sprechen. Maren beobachtete ihn drei Minuten — und wusste es. *Er ist es.* Sie hatte diesen Typ hundertmal gesehen: schuldig, verängstigt, versteckt.
+
+Die Verhöre begannen. Tomás widersprach sich, schwieg an falschen Stellen, vermied Blickkontakt. Maren registrierte alles, baute ihren Fall — akkurat, lückenlos, überwältigend.
+
+Zwei Wochen später gestand jemand anderes.
+
+Maren saß allein in ihrem Büro. Auf dem Tisch lagen ihre Notizen — seitenweise Beobachtungen über Tomás. Alles stimmte. Alles passte. Und trotzdem war es falsch.
+
+Ihr Kollege Piet klopfte an. „Wie ist es passiert?"
+
+„Ich habe ihn zu gut gekannt", sagte sie leise. „Jeden Zug, den ich in zwölf Jahren gesehen habe — schuldig, nervös, versteckt. Tomás hatte all das. Also war er es." Sie legte die Notizen um. „Ich habe nicht ermittelt. Ich habe bestätigt."
+
+Piet setzte sich. „Du hast die Vergangenheit auswendig gelernt."
+
+„Ja. Und dann habe ich jeden neuen Menschen durch diese Schablone gepresst." Sie tippte auf ihre Schläfe. „Mein Kopf war so voll mit dem, was war — dass er keinen Platz mehr hatte für das, was *ist*."
+
+Piet dachte nach. „Also warst du zu präzise für die alten Daten?"
+
+„Präzise", wiederholte Maren bitter. „Ich war perfekt für Fälle, die ich bereits kannte. Für jeden neuen Fall war ich blind."
+
+Sie stand auf und sah aus dem Fenster auf den Hafen.
+
+„Ein guter Detektiv darf nicht alles erinnern. Er muss vergessen können — muss das Wesentliche vom Zufall trennen. Sonst jagt er für immer die Schatten alter Fälle."
+
+---
+
+## Das Konzept: Overfitting
+
+**Overfitting** bezeichnet eines der zentralen Probleme des maschinellen Lernens: Ein Modell lernt die Trainingsdaten so präzise, dass es deren Rauschen und Zufälligkeiten mitlernt — und dadurch auf neuen, ungesehenen Daten versagt.
+
+Ein overgefittetes Modell hat eine zu hohe **Modellkomplexität** relativ zur Datenmenge. Es minimiert den Trainingsfehler nahezu auf null, aber der **Generalisierungsfehler** — die Leistung auf echten Testdaten — ist hoch. Formal lässt sich das durch den **Bias-Variance-Tradeoff** beschreiben:
+
+- **Hohe Varianz** (Overfitting): Das Modell reagiert extrem sensibel auf kleine Schwankungen in den Trainingsdaten. Jeder Ausreißer wird als Signal interpretiert.
+- **Hoher Bias** (Underfitting): Das Modell ist zu simpel und erfasst selbst die echten Muster nicht.
+
+Das Ziel ist die Balance — ein Modell, das generalisiert, ohne zu vereinfachen.
+
+**Typische Gegenmaßnahmen:**
+
+- **Regularisierung** (L1/Lasso, L2/Ridge): Bestraft komplexe Modelle, indem große Gewichte im Verlust penalisiert werden.
+- **Dropout** (in neuronalen Netzen): Deaktiviert zufällig Neuronen im Training, um Ko-Adaptation zu verhindern.
+- **Cross-Validation**: Bewertet das Modell systematisch auf mehreren Datensplits, nicht nur einem.
+- **Early Stopping**: Bricht das Training ab, sobald der Validierungsfehler zu steigen beginnt.
+- **Mehr Daten**: Der robusteste Schutz — je mehr echte Variation im Training, desto schwerer wird Rauschen mitgelernt.
+
+Overfitting ist kein Versagen des Algorithmus — es ist ein Versagen der **Generalisierungsabsicht**. Ein Modell optimiert genau das, wofür man es trainiert. Wer es auf Perfektion im Training trimmt, bekommt Perfektion auf Daten, die längst bekannt sind — und Versagen auf allem, was danach kommt.`
+    },
+    pvalue: {
+      title: "Hypothesentesten & p-Wert",
+      md: `## Die Richterin und die tausend Münzen
+
+Richterin Sorel war bekannt für eines: Sie glaubte niemandem — ohne Beweis.
+
+Eines Tages betrat ein Mann namens Cassian ihren Gerichtssaal. Er behauptete, eine besondere Münze zu besitzen. Keine gewöhnliche — eine, die grundsätzlich öfter Kopf zeige als Zahl. Er wollte damit Wetten gewinnen, legal, und brauchte ihre offizielle Beglaubigung.
+
+„Beweise es", sagte Sorel.
+
+Cassian warf die Münze. Kopf. Noch einmal. Kopf. Und noch einmal.
+
+Nach zehn Würfen: achtmal Kopf, zweimal Zahl.
+
+Der Anwalt neben ihm lächelte. „Achtzig Prozent. Überzeugt?"
+
+Sorel verschränkte die Arme. „Nein. Auch eine faire Münze kann zehnmal hintereinander fast nur Kopf zeigen. Das beweist nichts."
+
+Cassian warf weiter. Fünfzig Würfe. Hundert. Nach zweihundert Würfen: 119 mal Kopf. Fast 60 Prozent.
+
+Der Anwalt wurde ungeduldig. „Das ist doch kein Zufall mehr."
+
+„Vielleicht", sagte Sorel. „Aber ich brauche eine Zahl. Keine Meinung."
+
+Sie rief ihre Statistikerin. Die Frau rechnete kurz. „Bei einer fairen Münze und zweihundert Würfen wäre ein Ergebnis wie dieses — oder ein noch extremeres — mit einer Wahrscheinlichkeit von unter zwei Prozent zu erwarten."
+
+Stille im Saal.
+
+„Zwei Prozent", wiederholte Sorel langsam. „Das heißt: Wäre die Münze fair, wäre das hier trotzdem möglich — nur sehr unwahrscheinlich."
+
+„Ja", sagte die Statistikerin.
+
+„Aber es heißt nicht, dass die Münze zu neunundneunzig Prozent unfair ist?"
+
+Die Statistikerin zögerte. „Nein. Das ist ein anderer Satz."
+
+Cassian runzelte die Stirn. Sorel sah ihn an.
+
+„Ich beglaubige Folgendes", sagte sie schließlich. „Wenn deine Münze fair wäre, hätten wir heute etwas sehr Unwahrscheinliches erlebt. Ob sie es ist — das sage ich nicht."
+
+Sie lehnte sich vor. „Mein Urteil lautet: Die Daten sprechen gegen die Annahme einer fairen Münze. Mehr nicht. Die Wahrheit bleibt draußen."
+
+Cassian verstand nicht ganz. Aber die Statistikerin nickte langsam — so wie jemand nickt, der genau weiß, wie präzise eine Aussage gerade war.
+
+---
+
+## Das Konzept: Hypothesentesten und der p-Wert
+
+Das **Hypothesentesten** ist ein formales Verfahren, um auf Basis von Daten zwischen zwei konkurrierenden Annahmen zu unterscheiden — ohne jemals direkte Wahrheit zu beanspruchen.
+
+Die Struktur ist immer gleich:
+
+- **Nullhypothese H₀**: Die konservative Annahme — hier: „Die Münze ist fair" (p = 0,5).
+- **Alternativhypothese H₁**: Die zu zeigende Behauptung — „Die Münze ist unfair" (p ≠ 0,5).
+
+Der **p-Wert** beantwortet eine sehr präzise Frage: *Wie wahrscheinlich wäre ein Ergebnis wie das beobachtete — oder ein noch extremeres — wenn H₀ wahr wäre?*
+
+Ein kleiner p-Wert (typisch: p < 0,05) bedeutet: Die Daten sind unter H₀ sehr unwahrscheinlich. Man **verwirft H₀** — aber man beweist H₁ damit nicht.
+
+Was der p-Wert **nicht** ist, wird häufig falsch verstanden:
+
+- Er ist **nicht** die Wahrscheinlichkeit, dass H₀ wahr ist.
+- Er ist **nicht** die Wahrscheinlichkeit, dass das Ergebnis durch Zufall entstand.
+- Er sagt **nichts** über die Größe oder Bedeutsamkeit eines Effekts.
+
+Genau das formuliert Richterin Sorel: Ein p-Wert von 0,02 bedeutet nicht „99 % Chance, dass die Münze unfair ist" — das wäre eine **bayesianische** Aussage, die einen Prior erfordern würde. Der frequentistische p-Wert bleibt bewusst außerhalb dieser Aussage.
+
+Ergänzend sprechen Statistiker von **Signifikanzniveau α** (dem vorab festgelegten Schwellenwert), **Teststärke** (Power: Wahrscheinlichkeit, H₀ zu verwerfen, wenn H₁ wahr ist) und **Fehlerarten**: Typ-I-Fehler (H₀ fälschlicherweise verworfen) und Typ-II-Fehler (H₁ fälschlicherweise übersehen).
+
+Das Hypothesentesten ist damit kein Wahrheitsdetektor — sondern ein präzises Instrument zur **Kontrolle von Irrtümern**: Es legt fest, wie oft wir bereit sind, uns zu täuschen, bevor wir handeln.`
+    },
+    cantor: {
+      title: "Cantors Diagonalargument",
+      md: `## Die Frau, die Städte zählte
+
+Leila reiste. Nicht zum Vergnügen — sie suchte etwas, das sie nicht benennen konnte.
+
+Sie begann in einer kleinen Stadt am Meer. Dort lebten Menschen, die Zahlen liebten: ganze Zahlen, saubere Brüche, Verhältnisse. Alles war messbar, alles hatte einen Platz auf dem Zahlenstrahl. Leila fühlte sich wohl. Sie blieb eine Weile.
+
+Dann hörte sie von einer anderen Stadt — größer, weiter im Landesinneren. Dort gab es mehr: nicht nur Brüche, sondern auch Zahlen, die sich nicht als Verhältnis schreiben ließen. Wurzeln. Irrationale Werte. Die Stadt war voller als die erste, unendlich dichter — und trotzdem, versicherten ihr die Einwohner, war sie *abzählbar*. Man konnte jeden Bürger theoretisch in eine Reihe bringen, einen nach dem anderen durchnummerieren, bis in alle Ewigkeit.
+
+Leila reiste weiter.
+
+Die dritte Stadt hatte keinen Namen. Sie lag nicht auf einer Karte. Und als Leila ankam, verstand sie sofort, dass hier etwas anders war.
+
+Die Einwohner — alle reellen Zahlen zwischen null und eins, nur dieser winzige Ausschnitt — saßen nicht in Reihen. Sie standen überall gleichzeitig, dicht an dicht, ohne Anfang, ohne Abstand, ohne die Möglichkeit, auch nur einen von ihnen als *ersten* zu benennen.
+
+„Ich kann euch trotzdem zählen", sagte Leila. „Gebt mir Zeit."
+
+Ein alter Mann schüttelte den Kopf. „Das haben viele versucht. Zeig mir deine Liste — ich zeige dir, wen du vergessen hast."
+
+Leila schrieb. Eine unendlich lange Liste, so sorgfältig sie konnte. Der alte Mann sah kurz hin — und nannte eine Zahl, die nicht darin vorkam. Sie erweiterte die Liste. Er nannte eine weitere. Egal wie weit sie schrieb — er war schneller. Nicht weil er klüger war, sondern weil er eine Methode hatte: Er las die Diagonale ihrer Liste und veränderte jede Stelle. Das Ergebnis war immer jemand, den sie vergessen hatte.
+
+„Ihr seid zu viele", sagte Leila schließlich.
+
+„Nein", sagte der Mann. „Wir sind eine andere Art von unendlich."
+
+---
+
+## Das Konzept: Cantors Diagonalargument und überabzählbare Mengen
+
+**Georg Cantor** zeigte Ende des 19. Jahrhunderts, dass nicht alle Unendlichkeiten gleich groß sind — eine der radikalsten Entdeckungen der Mathematik.
+
+Zwei Mengen haben dieselbe **Mächtigkeit**, wenn man ihre Elemente umkehrbar eindeutig einander zuordnen kann — eine sogenannte **Bijektion**. Die natürlichen Zahlen ℕ, die ganzen Zahlen ℤ und sogar die rationalen Zahlen ℚ sind alle gleich mächtig: **abzählbar unendlich** (Mächtigkeit ℵ₀). Man kann ihre Elemente in eine geordnete Folge bringen.
+
+Cantor bewies jedoch, dass die reellen Zahlen ℝ — selbst nur das Intervall (0, 1) — **nicht** abzählbar sind. Der Beweis ist das **Diagonalargument**:
+
+Angenommen, es gäbe eine vollständige Liste aller reellen Zahlen in (0, 1):
+
+\`\`\`
+r₁ = 0. [4] 1 7 2 0 ...
+r₂ = 0. 5 [8] 3 1 4 ...
+r₃ = 0. 2 0 [0] 6 1 ...
+r₄ = 0. 9 3 7 [3] 8 ...
+...
+\`\`\`
+
+Man konstruiert eine neue Zahl d, indem man die **Diagonalstellen** nimmt — die n-te Nachkommastelle der n-ten Zahl — und jede Ziffer verändert (z. B. +1 modulo 10):
+
+\`\`\`
+d = 0. 5 9 1 4 ...
+\`\`\`
+
+Diese Zahl d unterscheidet sich von r₁ an Stelle 1, von r₂ an Stelle 2, von rₙ an Stelle n — also von *jeder* Zahl in der Liste. Sie fehlt. Die Liste war also nie vollständig — ein Widerspruch zur Annahme.
+
+Daraus folgt: Die Mächtigkeit von ℝ, bezeichnet als **𝔠** (Kontinuum), ist strikt größer als ℵ₀. Es gibt *mehr* reelle als natürliche Zahlen — obwohl beide Mengen unendlich sind.
+
+Cantor zeigte weiter, dass diese Hierarchie nicht endet: Die Potenzmenge jeder Menge ist stets mächtiger als die Menge selbst — es gibt unendlich viele Stufen des Unendlichen. Die Frage, ob zwischen ℵ₀ und 𝔠 eine weitere Mächtigkeit liegt, ist die berühmte **Kontinuumshypothese** — bis heute unentscheidbar innerhalb der Standardaxiome der Mathematik.`
+    },
+    sorting: {
+      title: "Untere Schranken der Komplexität",
+      md: `## Der Bibliothekar und die ewige Frage
+
+In einer alten Bibliothek arbeitete ein Mann namens Oryn. Seine Aufgabe war einfach: Bücher sortieren. Tausende davon, täglich neu angeliefert, chaotisch gestapelt — und er brachte sie in Ordnung.
+
+Er war gut darin. Nicht brillant, nicht schnell — aber methodisch. Er entwickelte über Jahre eine Technik: Er nahm immer zwei Bücher, verglich sie, legte das kleinere nach links. Dann das nächste Paar. Dann nochmal von vorn. Langsam, aber sicher.
+
+Eines Tages kam eine junge Assistentin namens Faye. Sie sah ihm zu — eine Stunde, zwei Stunden — und sagte dann: „Das dauert ewig."
+
+„Es funktioniert", antwortete Oryn.
+
+„Aber es gibt Schnelleres."
+
+Sie zeigte ihm ihre Methode: Stapel halbieren, jeden Halbstapel für sich sortieren, dann zusammenführen. Oryn brauchte drei Tage für tausend Bücher. Faye brauchte Stunden.
+
+Er lernte von ihr. Und bald lernte er noch mehr — von anderen, die kamen und gingen. Er wurde schneller, effizienter, eleganter.
+
+Dann, eines Abends, stellte ihm ein Gelehrter eine Frage.
+
+„Oryn. Du sortierst seit zwanzig Jahren. Sag mir — gibt es eine *schnellste* Art, Bücher zu sortieren? Eine Methode, die grundsätzlich nicht mehr zu übertreffen ist?"
+
+Oryn dachte lange nach. „Ich glaube schon. Je mehr Bücher, desto mehr Vergleiche — aber vielleicht wächst diese Zahl langsamer als ich denke."
+
+„Und wenn ich dir sage", fuhr der Gelehrte fort, „dass jede Methode, die Bücher durch Vergleichen sortiert — egal wie klug — mindestens n log n Vergleiche braucht? Dass das eine mathematische Grenze ist, keine technische?"
+
+Oryn blinzelte. „Dann wäre Fayes Methode… nicht zufällig gut. Sie wäre fast perfekt. Sie berührt diese Grenze."
+
+„Ja. Und du könntest dein Leben damit verbringen, es zu verbessern — und kämsst nicht weiter."
+
+Oryn sah auf seine Hände. Zwanzig Jahre. Tausende Stapel.
+
+„Ich habe also die ganze Zeit gegen eine Wand gearbeitet, die ich nicht sehen konnte."
+
+„Nein", sagte der Gelehrte ruhig. „Du hast die ganze Zeit auf sie zugelebt."
+
+---
+
+## Das Konzept: Untere Schranken der Komplexität — das Sortier-Lower-Bound
+
+In der Informatik geht es nicht nur darum, *gute* Algorithmen zu finden — sondern zu beweisen, wann man das **Bestmögliche** bereits erreicht hat.
+
+Für das vergleichsbasierte Sortieren gilt eine fundamentale **untere Schranke**: Jeder Algorithmus, der n Elemente ausschließlich durch paarweise Vergleiche sortiert, benötigt im schlechtesten Fall mindestens **Ω(n log n)** Vergleiche.
+
+Der Beweis nutzt ein **Entscheidungsbaum-Modell**: Jeder Vergleich entspricht einem Knoten mit zwei Ästen (kleiner / größer). Ein Sortierverfahren für n Elemente muss alle n! möglichen Permutationen unterscheiden können — also braucht der Baum mindestens n! Blätter. Die Tiefe eines Binärbaums mit n! Blättern ist mindestens log₂(n!), und mit der **Stirling-Approximation** gilt:
+
+> log₂(n!) ≈ n log₂ n − n log₂ e = **Θ(n log n)**
+
+Das bedeutet: Algorithmen wie **Mergesort** oder **Heapsort**, die exakt O(n log n) Vergleiche benötigen, sind **asymptotisch optimal** — sie berühren die untere Schranke. Kein vergleichsbasierter Algorithmus kann das prinzipiell unterbieten.
+
+Das ist keine technische Einschränkung, sondern eine **informationstheoretische**: Um eine unter n! Möglichkeiten eindeutig zu identifizieren, braucht man mindestens log₂(n!) Bits an Information — und jeder Vergleich liefert höchstens 1 Bit.
+
+Interessanterweise lässt sich diese Schranke **umgehen**, wenn man auf Vergleiche verzichtet: **Counting Sort** oder **Radix Sort** nutzen die Struktur der Schlüssel selbst und erreichen O(n) — aber nur unter zusätzlichen Annahmen über die Daten.
+
+Das Konzept der unteren Schranken ist eines der tiefsten in der theoretischen Informatik: Es verschiebt die Frage von „Wie schnell können wir es lösen?" zu „Wie schnell *kann* es überhaupt gelöst werden?" — und zieht damit eine harte Grenze zwischen dem Möglichen und dem Unmöglichen.`
+    }
+  };
+
+  const topicLabels = {
+    russell:     "Russells Paradoxon",
+    cantor:      "Cantors Diagonalargument",
+    turing:      "Unentscheidbarkeit",
+    sorting:     "Untere Schranken der Komplexität",
+    rdd:         "Regression Discontinuity Design",
+    iv:          "Instrumental Variable",
+    pvalue:      "Hypothesentesten & p-Wert",
+    overfitting: "Overfitting",
+    harness:     "Agentenevaluation",
+    window_fn:   "Window Functions (SQL)",
+    topology:    "Leitungssatz-Topologie"
+  };
+
+  const categories = [
+    { label: "Mathematik",   keys: ["russell", "cantor"] },
+    { label: "Informatik",   keys: ["turing", "sorting"] },
+    { label: "Data Science", keys: ["rdd", "iv", "pvalue"] },
+    { label: "KI",           keys: ["overfitting", "harness"] },
+    { label: "SQL",          keys: ["window_fn"] },
+    { label: "Engineering",  keys: ["topology"] }
+  ];
+
+  const grid = document.getElementById("topic-grid");
+  const viewTopics = document.getElementById("view-topics");
+  const viewStory = document.getElementById("view-story");
+  const storyTitle = document.getElementById("story-title");
+  const storyText = document.getElementById("story-text");
+
+  categories.forEach(cat => {
+    const lbl = document.createElement("p");
+    lbl.className = "category-label";
+    lbl.textContent = cat.label;
+    grid.appendChild(lbl);
+    cat.keys.forEach(key => {
+      const btn = document.createElement("button");
+      btn.className = "topic-card";
+      btn.textContent = topicLabels[key];
+      btn.addEventListener("click", () => showStory(key));
+      grid.appendChild(btn);
+    });
+  });
+
+  function showStory(key) {
+    const s = stories[key];
+    storyTitle.textContent = s.title;
+    storyText.innerHTML = renderMd(s.md);
+    viewTopics.classList.add("hidden");
+    viewStory.classList.add("active");
+    viewStory.classList.add("animate");
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("story-back-btn").addEventListener("click", () => {
+    viewStory.classList.remove("active", "animate");
+    viewTopics.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  });
+</script>
+</body>
+</html>

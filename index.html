@@ -2,36 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+  <!-- Primary SEO -->
   <title>Enxi Hong</title>
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <meta name="description" content="Hi, I'm Enxi Hong. Welcome to my little corner of the internet." />
+  <meta name="author" content="Enxi Hong" />
+  <link rel="canonical" href="https://enxihong.github.io/" />
 
-    html, body {
-      height: 100%;
-    }
+  <!-- Open Graph (social sharing + Google preview) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://enxihong.github.io/" />
+  <meta property="og:title" content="Enxi Hong" />
+  <meta property="og:description" content="Hi, I'm Enxi Hong. Welcome to my little corner of the internet." />
 
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: #fff;
-      color: #111;
-    }
+  <!-- Structured data: tells Google this is a person's page -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Enxi Hong",
+    "url": "https://enxihong.github.io/",
+    "sameAs": [
+      "https://github.com/enxihong"
+    ]
+  }
+  </script>
 
-    h1 {
-      font-size: clamp(2rem, 6vw, 4rem);
-      font-weight: 500;
-      letter-spacing: -0.02em;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Enxi Hong</h1>
+
+<div id="screen-start" class="screen">
+  <p class="greeting">Hi there! 👋</p>
+  <h1 id="name-title">I'm Enxi Hong</h1>
+  <p class="tagline">
+    Welcome to my little corner of the internet.<br>
+    Do you want to play some games?
+  </p>
+  <div class="start-buttons">
+    <button class="btn-primary" id="play-btn">Play games →</button>
+    <a class="btn-secondary" href="fabel.html">Lerne mit Geschichten →</a>
+    <a class="btn-secondary" href="https://github.com/enxihong" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</div>
+
+<div id="screen-menu" class="screen hidden">
+  <h2>choose a game</h2>
+  <div class="cards">
+    <div class="card" data-game="snake">
+      <div class="card-title">Snake</div>
+      <div class="card-desc">eat, grow<br>don't crash</div>
+    </div>
+    <div class="card" data-game="tetris">
+      <div class="card-title">Tetris</div>
+      <div class="card-desc">stack blocks<br>clear lines</div>
+    </div>
+    <div class="card" data-game="fishy">
+      <div class="card-title">Fishy</div>
+      <div class="card-desc">eat smaller fish<br>avoid bigger ones</div>
+    </div>
+    <div class="card" data-game="breakout">
+      <div class="card-title">Breakout</div>
+      <div class="card-desc">smash the bricks<br>catch the rewards</div>
+    </div>
+    <div class="card" data-game="draw">
+      <div class="card-title">Draw</div>
+      <div class="card-desc">paint something<br>share with friends</div>
+    </div>
+    <div class="card" data-game="pacman">
+      <div class="card-title">Pac-Man</div>
+      <div class="card-desc">eat dots<br>avoid ghosts</div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-game" class="screen hidden">
+  <div class="game-header">
+    <button id="back-btn">← back</button>
+    <div class="score-group">
+      <div class="score-item">
+        <span class="score-label">Score</span>
+        <span class="score-value" id="score">0</span>
+      </div>
+      <div class="score-item" id="level-item">
+        <span class="score-label">Level</span>
+        <span class="score-value" id="level">1</span>
+      </div>
+      <div class="score-item">
+        <span class="score-label">Best</span>
+        <span class="score-value" id="best">0</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvas-wrapper">
+    <canvas id="canvas"></canvas>
+    <div id="overlay">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-sub"></p>
+      <button id="share-score-btn" class="hidden">Score teilen →</button>
+    </div>
+  </div>
+
+  <div id="controls-snake" class="controls gone">
+    <button id="sn-up"    style="grid-column:2;grid-row:1">↑</button>
+    <button id="sn-left"  style="grid-column:1;grid-row:2">←</button>
+    <button id="sn-down"  style="grid-column:2;grid-row:2">↓</button>
+    <button id="sn-right" style="grid-column:3;grid-row:2">→</button>
+  </div>
+  <div id="controls-tetris" class="controls gone">
+    <button id="tet-left"   style="grid-column:1;grid-row:1">←</button>
+    <button id="tet-rotate" style="grid-column:2;grid-row:1">↺</button>
+    <button id="tet-right"  style="grid-column:3;grid-row:1">→</button>
+    <button id="tet-drop"   style="grid-column:2;grid-row:2">↓</button>
+  </div>
+  <div id="controls-pacman" class="controls gone">
+    <button id="pm-up"    style="grid-column:2;grid-row:1">↑</button>
+    <button id="pm-left"  style="grid-column:1;grid-row:2">←</button>
+    <button id="pm-down"  style="grid-column:2;grid-row:2">↓</button>
+    <button id="pm-right" style="grid-column:3;grid-row:2">→</button>
+  </div>
+
+  <!-- Draw toolbar -->
+  <div id="draw-toolbar" class="gone">
+    <div id="draw-colors"></div>
+    <div id="draw-actions">
+      <button class="draw-size" data-size="4"  title="Small"></button>
+      <button class="draw-size" data-size="10" title="Medium"></button>
+      <button class="draw-size" data-size="22" title="Large"></button>
+      <button class="draw-size" data-size="40" title="XL"></button>
+      <div class="draw-sep"></div>
+      <button id="draw-eraser" title="Eraser">✕</button>
+      <button id="draw-undo"   title="Undo">↩</button>
+      <button id="draw-clear"  title="Clear">⬜</button>
+      <button id="draw-share"  title="Save / Share">↑</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/snake.js"></script>
+<script src="js/tetris.js"></script>
+<script src="js/fishy.js"></script>
+<script src="js/breakout.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/pacman.js"></script>
 </body>
 </html>
