@@ -18,10 +18,24 @@ const canvas=$('canvas'), ctx=canvas.getContext('2d');
 const overlay=$('overlay'), overlayTitle=$('overlay-title'), overlaySub=$('overlay-sub');
 const scoreEl=$('score'), levelEl=$('level'), levelItem=$('level-item'), bestEl=$('best');
 const ctrlSnake=$('controls-snake'), ctrlTetris=$('controls-tetris'), ctrlPacman=$('controls-pacman'), drawToolbar=$('draw-toolbar');
+const shareScoreBtn=$('share-score-btn');
 let activeGame=null;
 
-function showOverlay(title,sub){overlayTitle.textContent=title;overlaySub.textContent=sub;overlay.classList.remove('hidden');}
-function hideOverlay(){overlay.classList.add('hidden');}
+function showOverlay(title,sub){overlayTitle.textContent=title;overlaySub.textContent=sub;shareScoreBtn.classList.add('hidden');overlay.classList.remove('hidden');}
+function hideOverlay(){overlay.classList.add('hidden');shareScoreBtn.classList.add('hidden');}
+
+const _gameNames={snake:'Snake',tetris:'Tetris',fishy:'Fishy',breakout:'Breakout',pacman:'Pac-Man'};
+function showShareScore(game,score){
+  shareScoreBtn.classList.remove('hidden');
+  shareScoreBtn.textContent='Score teilen →';
+  shareScoreBtn.onclick=e=>{
+    e.stopPropagation();
+    const url=`${location.origin}${location.pathname}?game=${game}&score=${score}`;
+    const text=`Kannst du mich schlagen? ${score} Punkte in ${_gameNames[game]}! ${url}`;
+    if(navigator.share){navigator.share({title:_gameNames[game],text,url});}
+    else{navigator.clipboard.writeText(url).then(()=>{shareScoreBtn.textContent='Link kopiert!';setTimeout(()=>{shareScoreBtn.textContent='Score teilen →';},2000)}).catch(()=>{prompt('Link kopieren:',url);});}
+  };
+}
 
 function calcCell(cols,rows){
   const touch=window.matchMedia('(pointer: coarse)').matches;
@@ -84,3 +98,11 @@ function triggerStart(){
   if(activeGame==='breakout') breakout.start();
   if(activeGame==='pacman')   pacman.start();
 }
+
+window.addEventListener('load',()=>{
+  const p=new URLSearchParams(location.search);
+  const game=p.get('game'),score=parseInt(p.get('score'));
+  if(!game||!score||!['snake','tetris','fishy','breakout','pacman'].includes(game))return;
+  const card=document.querySelector(`.card[data-game="${game}"]`);
+  if(card){card.click();showOverlay(`${score} Punkte in ${_gameNames[game]}!`,'Kannst du mich schlagen? — tippe zum Spielen');}
+});

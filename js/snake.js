@@ -32,7 +32,7 @@ const snake=(()=>{
     }else{state.snake.pop();}
     draw();
   }
-  function die(){stop();showOverlay('Game Over',`Score: ${state.score} — tap to restart`);shake();}
+  function die(){stop();showOverlay('Game Over',`Score: ${state.score} — tap to restart`);showShareScore('snake',state.score);shake();}
   function shake(){let i=0;const id=setInterval(()=>{const d=4*(1-i/8);canvas.style.transform=i%2===0?`translateX(${d}px)`:`translateX(${-d}px)`;if(++i>8){clearInterval(id);canvas.style.transform='';}},50);}
   function setDir(d){if(!state)return;if(!(d.x===-state.dir.x&&d.y===-state.dir.y))state.next=d;}
   function drawIdle(){

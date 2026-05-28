@@ -133,6 +133,7 @@ const fishy=(()=>{
   function die(){
     stop();
     showOverlay('You got eaten!',`Score: ${score} — tap to try again`);
+    showShareScore('fishy',score);
   }
 
   function drawFish(x,y,r,color,dir,wobble,alpha){

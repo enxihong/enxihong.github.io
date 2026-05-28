@@ -41,7 +41,7 @@ const tetris=(()=>{
   function moveRight(){if(valid(cur.shape,cur.x+1,cur.y)){cur.x++;draw();}}
   function doRotate(){const r=rotate(cur.shape);for(const k of[0,1,-1,2,-2]){if(valid(r,cur.x+k,cur.y)){cur.shape=r;cur.x+=k;draw();return;}}}
   const ghostY=()=>{let gy=cur.y;while(valid(cur.shape,cur.x,gy+1))gy++;return gy;};
-  function die(){running=false;clearInterval(dropTimer);showOverlay('Game Over',`Score: ${score} — tap to restart`);}
+  function die(){running=false;clearInterval(dropTimer);showOverlay('Game Over',`Score: ${score} — tap to restart`);showShareScore('tetris',score);}
   function drawCell(c,r,color){
     ctx.fillStyle=color;ctx.fillRect(c*cell+1,r*cell+1,cell-2,cell-2);
     ctx.fillStyle='rgba(255,255,255,0.22)';ctx.fillRect(c*cell+1,r*cell+1,cell-2,Math.min(4,cell/4));

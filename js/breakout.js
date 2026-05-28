@@ -269,7 +269,7 @@ const breakout = (() => {
     ctx.fillStyle='#ccc';ctx.beginPath();ctx.arc(W/2,py-20,7,0,Math.PI*2);ctx.fill();
   }
 
-  function die(){running=false;cancelAnimationFrame(raf);showOverlay('Game Over',`Score: ${score} — tap to restart`);}
+  function die(){running=false;cancelAnimationFrame(raf);showOverlay('Game Over',`Score: ${score} — tap to restart`);showShareScore('breakout',score);}
 
   function init(){
     stop();initCanvas();score=0;lives=3;level=1;speedMult=1;fastUntil=0;slowUntil=0;

@@ -152,6 +152,19 @@
     #overlay.hidden { display: none; }
     #overlay h2 { font-size: 1.25rem; font-weight: 500; }
     #overlay p { font-size: 0.78rem; color: #888; text-align: center; line-height: 1.6; }
+    #share-score-btn {
+      margin-top: 6px;
+      background: #111; color: #fff;
+      border: none; border-radius: 2px;
+      padding: 8px 20px;
+      font: inherit; font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #share-score-btn:hover { opacity: 0.75; }
+    #share-score-btn.hidden { display: none; }
 
     .controls { display: grid; gap: 6px; }
     .controls.gone { display: none; }

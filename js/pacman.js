@@ -279,6 +279,7 @@ const pacman=(()=>{
   function die(){
     running=false; cancelAnimationFrame(raf); raf=null;
     showOverlay('Game Over',`Score: ${score} — tap to restart`);
+    showShareScore('pacman',score);
   }
 
   function nextLevel(){
