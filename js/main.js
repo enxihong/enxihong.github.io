@@ -25,6 +25,12 @@ function showOverlay(title,sub){overlayTitle.textContent=title;overlaySub.textCo
 function hideOverlay(){overlay.classList.add('hidden');shareScoreBtn.classList.add('hidden');}
 
 const _gameNames={snake:'Snake',tetris:'Tetris',fishy:'Fishy',breakout:'Breakout',pacman:'Pac-Man'};
+function _scoreHash(game,score){
+  const s=`${game}|${score}|eh42`;
+  let h=0x811c9dc5;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}
+  return h.toString(36).slice(0,6);
+}
 function _confirmCopied(){shareScoreBtn.textContent='Link copied!';setTimeout(()=>{shareScoreBtn.textContent='Share score →';},2000);}
 function _copyUrl(url){
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -42,7 +48,7 @@ function showShareScore(game,score){
   shareScoreBtn.classList.remove('hidden');
   shareScoreBtn.textContent='Share score →';
   shareScoreBtn.onclick=()=>{
-    const url=`${location.origin}${location.pathname}?game=${game}&score=${score}`;
+    const url=`${location.origin}${location.pathname}?game=${game}&score=${score}&h=${_scoreHash(game,score)}`;
     if(navigator.share){
       navigator.share({title:_gameNames[game],text:`Can you beat me? ${score} pts in ${_gameNames[game]}!`,url})
         .then(_confirmCopied).catch(()=>_copyUrl(url));
@@ -114,8 +120,9 @@ function triggerStart(){
 
 window.addEventListener('load',()=>{
   const p=new URLSearchParams(location.search);
-  const game=p.get('game'),score=parseInt(p.get('score'));
+  const game=p.get('game'),score=parseInt(p.get('score')),h=p.get('h');
   if(!game||!score||!['snake','tetris','fishy','breakout','pacman'].includes(game))return;
+  if(!h||h!==_scoreHash(game,score))return;
   const card=document.querySelector(`.card[data-game="${game}"]`);
   if(card){card.click();showOverlay(`${score} pts in ${_gameNames[game]}!`,'Can you beat me? — tap to play');}
 });
