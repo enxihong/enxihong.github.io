@@ -27,23 +27,26 @@ function hideOverlay(){overlay.classList.add('hidden');shareScoreBtn.classList.a
 const _gameNames={snake:'Snake',tetris:'Tetris',fishy:'Fishy',breakout:'Breakout',pacman:'Pac-Man'};
 function _confirmCopied(){shareScoreBtn.textContent='Link copied!';setTimeout(()=>{shareScoreBtn.textContent='Share score →';},2000);}
 function _copyUrl(url){
-  if(navigator.clipboard){navigator.clipboard.writeText(url).then(_confirmCopied).catch(()=>_fallbackCopy(url));}
-  else{_fallbackCopy(url);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(_confirmCopied).catch(()=>_fallbackCopy(url));
+  }else{_fallbackCopy(url);}
 }
 function _fallbackCopy(url){
-  const ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;opacity:0';
-  document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');_confirmCopied();}catch{prompt('Copy this link:',url);}
+  const ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  const ok=document.execCommand('copy');
   document.body.removeChild(ta);
+  if(ok){_confirmCopied();}else{window.prompt('Copy this link:',url);}
 }
 function showShareScore(game,score){
   shareScoreBtn.classList.remove('hidden');
   shareScoreBtn.textContent='Share score →';
-  shareScoreBtn.onclick=e=>{
-    e.stopPropagation();
+  shareScoreBtn.onclick=()=>{
     const url=`${location.origin}${location.pathname}?game=${game}&score=${score}`;
-    if(navigator.share){navigator.share({title:_gameNames[game],text:`Can you beat me? ${score} pts in ${_gameNames[game]}!`,url}).catch(()=>_copyUrl(url));}
-    else{_copyUrl(url);}
+    if(navigator.share){
+      navigator.share({title:_gameNames[game],text:`Can you beat me? ${score} pts in ${_gameNames[game]}!`,url})
+        .then(_confirmCopied).catch(()=>_copyUrl(url));
+    }else{_copyUrl(url);}
   };
 }
 
@@ -97,7 +100,7 @@ window.addEventListener('resize',()=>{
   if(activeGame==='pacman')   pacman.resize();
 });
 
-overlay.addEventListener('click', e=>{if(e.target!==shareScoreBtn)triggerStart();});
+overlay.addEventListener('click', triggerStart);
 document.addEventListener('keydown',e=>{
   if((e.key===' '||e.key==='Enter')&&!overlay.classList.contains('hidden')){e.preventDefault();triggerStart();}
 });
