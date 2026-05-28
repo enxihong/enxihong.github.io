@@ -159,6 +159,12 @@
       line-height: 1.6;
     }
     #story-text pre code { background: none; padding: 0; border-radius: 0; }
+    #story-text blockquote {
+      border-left: 3px solid #ddd;
+      margin: 1em 0;
+      padding: 4px 16px;
+      color: #555;
+    }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
@@ -196,6 +202,7 @@
         const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         return '<pre><code>' + esc + '</code></pre>';
       }
+      if (t.startsWith('> '))  return '<blockquote>' + inl(t.slice(2)) + '</blockquote>';
       if (t.startsWith('### ')) return '<h3>' + inl(t.slice(4)) + '</h3>';
       if (t.startsWith('## ')) return '<h2>' + inl(t.slice(3)) + '</h2>';
       const lines = t.split('\n');
@@ -826,6 +833,62 @@ Diese Zahl d unterscheidet sich von r₁ an Stelle 1, von r₂ an Stelle 2, von 
 Daraus folgt: Die Mächtigkeit von ℝ, bezeichnet als **𝔠** (Kontinuum), ist strikt größer als ℵ₀. Es gibt *mehr* reelle als natürliche Zahlen — obwohl beide Mengen unendlich sind.
 
 Cantor zeigte weiter, dass diese Hierarchie nicht endet: Die Potenzmenge jeder Menge ist stets mächtiger als die Menge selbst — es gibt unendlich viele Stufen des Unendlichen. Die Frage, ob zwischen ℵ₀ und 𝔠 eine weitere Mächtigkeit liegt, ist die berühmte **Kontinuumshypothese** — bis heute unentscheidbar innerhalb der Standardaxiome der Mathematik.`
+    },
+    sorting: {
+      title: "Untere Schranken der Komplexität",
+      md: `## Der Bibliothekar und die ewige Frage
+
+In einer alten Bibliothek arbeitete ein Mann namens Oryn. Seine Aufgabe war einfach: Bücher sortieren. Tausende davon, täglich neu angeliefert, chaotisch gestapelt — und er brachte sie in Ordnung.
+
+Er war gut darin. Nicht brillant, nicht schnell — aber methodisch. Er entwickelte über Jahre eine Technik: Er nahm immer zwei Bücher, verglich sie, legte das kleinere nach links. Dann das nächste Paar. Dann nochmal von vorn. Langsam, aber sicher.
+
+Eines Tages kam eine junge Assistentin namens Faye. Sie sah ihm zu — eine Stunde, zwei Stunden — und sagte dann: „Das dauert ewig."
+
+„Es funktioniert", antwortete Oryn.
+
+„Aber es gibt Schnelleres."
+
+Sie zeigte ihm ihre Methode: Stapel halbieren, jeden Halbstapel für sich sortieren, dann zusammenführen. Oryn brauchte drei Tage für tausend Bücher. Faye brauchte Stunden.
+
+Er lernte von ihr. Und bald lernte er noch mehr — von anderen, die kamen und gingen. Er wurde schneller, effizienter, eleganter.
+
+Dann, eines Abends, stellte ihm ein Gelehrter eine Frage.
+
+„Oryn. Du sortierst seit zwanzig Jahren. Sag mir — gibt es eine *schnellste* Art, Bücher zu sortieren? Eine Methode, die grundsätzlich nicht mehr zu übertreffen ist?"
+
+Oryn dachte lange nach. „Ich glaube schon. Je mehr Bücher, desto mehr Vergleiche — aber vielleicht wächst diese Zahl langsamer als ich denke."
+
+„Und wenn ich dir sage", fuhr der Gelehrte fort, „dass jede Methode, die Bücher durch Vergleichen sortiert — egal wie klug — mindestens n log n Vergleiche braucht? Dass das eine mathematische Grenze ist, keine technische?"
+
+Oryn blinzelte. „Dann wäre Fayes Methode… nicht zufällig gut. Sie wäre fast perfekt. Sie berührt diese Grenze."
+
+„Ja. Und du könntest dein Leben damit verbringen, es zu verbessern — und kämsst nicht weiter."
+
+Oryn sah auf seine Hände. Zwanzig Jahre. Tausende Stapel.
+
+„Ich habe also die ganze Zeit gegen eine Wand gearbeitet, die ich nicht sehen konnte."
+
+„Nein", sagte der Gelehrte ruhig. „Du hast die ganze Zeit auf sie zugelebt."
+
+---
+
+## Das Konzept: Untere Schranken der Komplexität — das Sortier-Lower-Bound
+
+In der Informatik geht es nicht nur darum, *gute* Algorithmen zu finden — sondern zu beweisen, wann man das **Bestmögliche** bereits erreicht hat.
+
+Für das vergleichsbasierte Sortieren gilt eine fundamentale **untere Schranke**: Jeder Algorithmus, der n Elemente ausschließlich durch paarweise Vergleiche sortiert, benötigt im schlechtesten Fall mindestens **Ω(n log n)** Vergleiche.
+
+Der Beweis nutzt ein **Entscheidungsbaum-Modell**: Jeder Vergleich entspricht einem Knoten mit zwei Ästen (kleiner / größer). Ein Sortierverfahren für n Elemente muss alle n! möglichen Permutationen unterscheiden können — also braucht der Baum mindestens n! Blätter. Die Tiefe eines Binärbaums mit n! Blättern ist mindestens log₂(n!), und mit der **Stirling-Approximation** gilt:
+
+> log₂(n!) ≈ n log₂ n − n log₂ e = **Θ(n log n)**
+
+Das bedeutet: Algorithmen wie **Mergesort** oder **Heapsort**, die exakt O(n log n) Vergleiche benötigen, sind **asymptotisch optimal** — sie berühren die untere Schranke. Kein vergleichsbasierter Algorithmus kann das prinzipiell unterbieten.
+
+Das ist keine technische Einschränkung, sondern eine **informationstheoretische**: Um eine unter n! Möglichkeiten eindeutig zu identifizieren, braucht man mindestens log₂(n!) Bits an Information — und jeder Vergleich liefert höchstens 1 Bit.
+
+Interessanterweise lässt sich diese Schranke **umgehen**, wenn man auf Vergleiche verzichtet: **Counting Sort** oder **Radix Sort** nutzen die Struktur der Schlüssel selbst und erreichen O(n) — aber nur unter zusätzlichen Annahmen über die Daten.
+
+Das Konzept der unteren Schranken ist eines der tiefsten in der theoretischen Informatik: Es verschiebt die Frage von „Wie schnell können wir es lösen?" zu „Wie schnell *kann* es überhaupt gelöst werden?" — und zieht damit eine harte Grenze zwischen dem Möglichen und dem Unmöglichen.`
     }
   };
 
@@ -833,6 +896,7 @@ Cantor zeigte weiter, dass diese Hierarchie nicht endet: Die Potenzmenge jeder M
     russell:     "Russells Paradoxon",
     cantor:      "Cantors Diagonalargument",
     turing:      "Unentscheidbarkeit",
+    sorting:     "Untere Schranken der Komplexität",
     rdd:         "Regression Discontinuity Design",
     iv:          "Instrumental Variable",
     pvalue:      "Hypothesentesten & p-Wert",
@@ -844,7 +908,7 @@ Cantor zeigte weiter, dass diese Hierarchie nicht endet: Die Potenzmenge jeder M
 
   const categories = [
     { label: "Mathematik",   keys: ["russell", "cantor"] },
-    { label: "Informatik",   keys: ["turing"] },
+    { label: "Informatik",   keys: ["turing", "sorting"] },
     { label: "Data Science", keys: ["rdd", "iv", "pvalue"] },
     { label: "KI",           keys: ["overfitting", "harness"] },
     { label: "SQL",          keys: ["window_fn"] },
