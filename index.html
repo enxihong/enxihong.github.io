@@ -13,13 +13,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-size: clamp(1.6rem, 4.5vw, 2.8rem);
+      font-weight: 300;
       color: #111;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.06em;
       pointer-events: none;
       user-select: none;
       text-align: center;
+      animation: fadein 1.2s ease;
     }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
@@ -49,7 +52,7 @@
     class Bubble {
       constructor(special) {
         this.special = !!special;
-        this.r  = this.special ? 52 : rand(18, 40);
+        this.r  = this.special ? 34 : rand(18, 40);
         this.x  = rand(this.r, W - this.r);
         this.y  = rand(this.r, H - this.r);
         const spd   = this.special ? rand(1.0, 1.8) : rand(1.5, 3.2);
@@ -79,15 +82,15 @@
         const r = this.currentR();
         ctx.save();
         if (this.special) {
-          ctx.shadowColor = '#f7c948';
-          ctx.shadowBlur  = 22;
+          ctx.globalAlpha = 0.72;
+          ctx.shadowColor = '#c8901a';
+          ctx.shadowBlur  = 5;
           const g = ctx.createRadialGradient(
-            this.x - r * 0.3, this.y - r * 0.3, r * 0.08,
+            this.x - r * 0.25, this.y - r * 0.25, r * 0.05,
             this.x, this.y, r
           );
-          g.addColorStop(0,   '#fffde4');
-          g.addColorStop(0.4, '#f7c948');
-          g.addColorStop(1,   '#f0a500');
+          g.addColorStop(0,   '#f5d88a');
+          g.addColorStop(1,   '#c8901a');
           ctx.fillStyle = g;
         } else {
           ctx.globalAlpha = this.alpha;
