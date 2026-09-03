@@ -14,7 +14,16 @@ js/fishy.js     Fishy game (~200 lines)
 js/breakout.js  Breakout game (~220 lines)
 js/draw.js      Draw tool (~130 lines)
 js/pacman.js    Pac-Man game (~320 lines)
+spiegel/        App-Datenschutzbericht-Viewer (eigenständig, siehe unten)
 ```
+
+## spiegel/ — separater Bereich
+
+Statischer Viewer für den iOS-App-Datenschutzbericht, unabhängig vom Rest der
+Seite (eigenes `style.css`, ES-Module, keine gemeinsamen Globals). Verlinkt von
+`home.html`. Regeln dort: kein Backend, kein Netzwerk-Call zur Laufzeit,
+CSP auf `'self'` — also kein Inline-Skript, kein Inline-Style, kein CDN.
+Details in `spiegel/README.md`.
 
 ## Globals defined in main.js
 

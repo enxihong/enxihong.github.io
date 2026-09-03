@@ -17,6 +17,13 @@ The site features a collection of browser-based games playable on desktop and mo
   - Power-ups: wide paddle, fast ball, slow ball, multi-ball, extra life, star (+50 pts)
   - Bombs: instant game over if caught
 
+## Spiegel
+
+A static viewer for the iOS App Privacy Report at /spiegel/. Drop the
+`.ndjson` export in and it shows which app used which sensor and which domains
+it contacted in the background. Runs entirely in the browser: no backend, no
+runtime network calls, Content-Security-Policy limited to 'self'. German UI.
+
 ## Links
 
 - [Website](https://enxihong.github.io/)

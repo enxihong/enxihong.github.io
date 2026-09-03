@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    Prinzip 2 der Spec, technisch erzwungen statt nur behauptet:
+    alles außer 'self' ist verboten. Kein CDN, keine Fonts, kein Analytics.
+    (frame-ancestors wirkt im Meta-Tag nicht — siehe README.)
+  -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'" />
+
+  <title>Spiegel — dein App-Datenschutzbericht, lesbar</title>
+  <meta name="description" content="Statischer Viewer für den iOS-App-Datenschutzbericht. Läuft komplett im Browser, ohne Backend und ohne Netzwerk-Calls." />
+  <link rel="canonical" href="https://enxihong.github.io/spiegel/" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<main class="page">
+
+  <a class="back-link" href="../home.html">← zurück</a>
+
+  <header class="head">
+    <h1>Spiegel</h1>
+    <p class="lede">
+      Dein iOS-App-Datenschutzbericht, lesbar gemacht: welche App auf welchen
+      Sensor zugegriffen hat und mit wem sie im Hintergrund gesprochen hat.
+    </p>
+  </header>
+
+  <!-- ---------------------------------------------------------------- -->
+  <!-- Startansicht                                                      -->
+  <!-- ---------------------------------------------------------------- -->
+  <section id="view-start">
+
+    <div class="choice">
+      <label class="btn-primary" for="file-input">Ich habe meine Datei</label>
+      <input id="file-input" type="file" accept=".ndjson,.json,.txt" hidden />
+      <button class="btn-primary" id="demo-btn" type="button">Beispielbericht ansehen</button>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <span>oder die <code>.ndjson</code>-Datei hierher ziehen</span>
+    </div>
+
+    <p id="status" class="status" hidden></p>
+
+    <section class="block">
+      <h2>Woher kommt die Datei?</h2>
+      <blockquote>
+        Einstellungen → Datenschutz &amp; Sicherheit → App-Datenschutzbericht →
+        einschalten. Nach ein paar Tagen dort auf das Teilen-Symbol tippen und
+        die Datei sichern.
+      </blockquote>
+      <p class="note">
+        Der Bericht muss erst eingeschaltet werden und sammelt dann sieben Tage.
+        Bis dahin zeigt der Beispielbericht in zehn Sekunden, was hier
+        herauskommt.
+      </p>
+    </section>
+
+    <section class="block promise">
+      <h2>Was hier nicht passiert</h2>
+      <ul>
+        <li><strong>Kein Backend.</strong> Die Datei wird im Browser gelesen und nirgendwo hochgeladen.</li>
+        <li><strong>Kein Netzwerk-Call zur Laufzeit.</strong> Nachschlagetabellen liegen als Dateien daneben. Network-Tab öffnen und nachsehen.</li>
+        <li><strong>Quelloffen.</strong> Das Versprechen ist nur so viel wert wie der Code, in dem man es nachlesen kann.</li>
+      </ul>
+      <p class="note">Kein Analytics, keine externen Schriften, kein CDN, keine Fehler-Telemetrie.</p>
+    </section>
+
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <!-- Bericht                                                           -->
+  <!-- ---------------------------------------------------------------- -->
+  <section id="view-report" hidden>
+
+    <p id="report-banner" class="banner" hidden></p>
+
+    <p class="range" id="report-range"></p>
+
+    <div class="bignums">
+      <div class="bignum"><span class="num" id="stat-apps">–</span><span class="lbl">Apps</span></div>
+      <div class="bignum"><span class="num" id="stat-accesses">–</span><span class="lbl">Sensorzugriffe</span></div>
+      <div class="bignum"><span class="num" id="stat-domains">–</span><span class="lbl">Domains</span></div>
+    </div>
+
+    <p class="summary" id="report-summary"></p>
+
+    <p class="caveat">
+      Der Spiegel zeigt Verbindungen, keine Inhalte. Der Datenverkehr ist
+      verschlüsselt — dass eine App mit einem Werbenetzwerk spricht, beweist
+      nicht, <em>was</em> sie überträgt.
+    </p>
+
+    <div class="listhead">
+      <h2>Apps</h2>
+      <span>sortiert nach Auffälligkeit</span>
+    </div>
+
+    <div id="app-list"></div>
+
+    <p class="parsenote" id="parse-note"></p>
+
+    <div class="report-actions">
+      <button class="btn-secondary" id="reset-btn" type="button">Anderen Bericht laden</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
