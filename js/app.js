@@ -66,7 +66,6 @@ function footer() {
 async function quiz() {
   document.title = 'Taking the test… · Vibe Coder Test';
   const id = run;
-  const scores = {};
   let fast = reduceMotion;
 
   app.innerHTML = `
@@ -76,7 +75,7 @@ async function quiz() {
         <div class="term-progress"><div id="progress"></div></div>
         <div class="term-body" id="out"></div>
       </div>
-      <p class="hint">Tap or press 1–4 to answer. Tap the terminal to skip the typing.</p>
+      <p class="hint">Tap or press 1–4 to answer, ← or Backspace to go back. Tap the terminal to skip the typing.</p>
     </main>`;
   const out = document.getElementById('out');
   out.addEventListener('click', () => { fast = true; });
@@ -89,7 +88,7 @@ async function quiz() {
     alive();
     const line = document.createElement('div');
     line.className = 'line ' + cls;
-    out.appendChild(line);
+    target.appendChild(line);
     for (const ch of text) {
       if (fast) { line.textContent = text; break; }
       line.textContent += ch;
@@ -100,11 +99,13 @@ async function quiz() {
     scroll();
   }
 
-  function choose(q) {
+  // Resolves with the picked option index, or -1 for "go back".
+  function choose(q, canBack) {
     const box = document.createElement('div');
     box.className = 'options';
-    box.innerHTML = q.options.map((o, i) => `<button><b>[${i + 1}]</b> ${esc(o.text)}</button>`).join('');
-    out.appendChild(box);
+    box.innerHTML = q.options.map((o, i) => `<button><b>[${i + 1}]</b> ${esc(o.text)}</button>`).join('')
+      + (canBack ? '<button class="go-back"><b>[←]</b> go back</button>' : '');
+    target.appendChild(box);
     scroll();
     const buttons = [...box.children];
     return new Promise(resolve => {
@@ -113,49 +114,83 @@ async function quiz() {
         buttons.forEach((b, j) => { b.disabled = true; b.classList.toggle('picked', i === j); });
         resolve(i);
       };
-      buttons.forEach((b, i) => b.addEventListener('click', e => { e.stopPropagation(); pick(i); }));
-      onKey = e => { const n = +e.key; if (n >= 1 && n <= q.options.length) pick(n - 1); };
+      buttons.forEach((b, i) => b.addEventListener('click', e => { e.stopPropagation(); pick(i < q.options.length ? i : -1); }));
+      onKey = e => {
+        const n = +e.key;
+        if (n >= 1 && n <= q.options.length) pick(n - 1);
+        else if (canBack && (e.key === 'Backspace' || e.key === 'ArrowLeft')) pick(-1);
+      };
     });
   }
 
+  // Removes the last answered question from the terminal so it gets asked again.
+  function undo(answers, block) {
+    block.remove();
+    out.lastElementChild.remove();
+    answers.pop();
+    fast = true;
+  }
+
+  let target = out;
   try {
     await say('$ npx whoami-vibe', 'cmd');
     await say('scanning your vibes...', 'dim');
     await say(`${QUESTIONS.length} questions. no wrong answers. only embarrassing ones.`, 'dim');
     await sleep(400);
 
-    for (const [i, q] of QUESTIONS.entries()) {
-      document.getElementById('term-title').textContent = `whoami-vibe — ${i + 1}/${QUESTIONS.length}`;
-      document.getElementById('progress').style.width = (i / QUESTIONS.length * 100) + '%';
-      out.appendChild(document.createElement('br'));
-      await say('$ ' + q.cmd, 'cmd');
-      await say(`[${i + 1}/${QUESTIONS.length}] ${q.q}`, 'q');
-      const o = q.options[await choose(q)];
+    const answers = [];
+    while (true) {
+      while (answers.length < QUESTIONS.length) {
+        const i = answers.length, q = QUESTIONS[i];
+        document.getElementById('term-title').textContent = `whoami-vibe — ${i + 1}/${QUESTIONS.length}`;
+        document.getElementById('progress').style.width = (i / QUESTIONS.length * 100) + '%';
+        const block = target = out.appendChild(document.createElement('section'));
+        block.appendChild(document.createElement('br'));
+        await say('$ ' + q.cmd, 'cmd');
+        await say(`[${i + 1}/${QUESTIONS.length}] ${q.q}`, 'q');
+        const c = await choose(q, i > 0);
+        alive();
+        fast = reduceMotion;
+        if (c < 0) { undo(answers, block); continue; }
+        answers.push(c);
+        await say('→ ' + q.options[c].r, 'reply');
+        await sleep(350);
+      }
+
+      document.getElementById('progress').style.width = '100%';
+      const scores = {};
+      answers.forEach((c, i) => { for (const [k, v] of Object.entries(QUESTIONS[i].options[c].t)) scores[k] = (scores[k] || 0) + v; });
+      const { winner, traits } = evaluate(scores);
+      const block = target = out.appendChild(document.createElement('section'));
+      block.appendChild(document.createElement('br'));
+      for (const l of ['$ analyze --brutal', 'reading commit history... found "pls work" (x14)', 'counting tests... 0', 'measuring token usage... concerning', 'asking the AI about you... it sighed']) {
+        await say(l, l.startsWith('$') ? 'cmd' : 'dim');
+        await sleep(250);
+      }
+      await say(`match found: ${TYPES[winner].name} ${TYPES[winner].emoji}`, 'result');
+
+      const open = document.createElement('button');
+      open.className = 'open-report';
+      open.textContent = '[enter] open full report →';
+      const back = document.createElement('button');
+      back.className = 'open-report go-back';
+      back.textContent = '[←] change last answer';
+      block.append(open, back);
+      scroll();
+      open.focus({ preventScroll: true });
+      const report = await new Promise(resolve => {
+        open.addEventListener('click', () => resolve(true));
+        back.addEventListener('click', e => { e.stopPropagation(); resolve(false); });
+        onKey = e => {
+          if (e.key === 'Enter') resolve(true);
+          else if (e.key === 'Backspace' || e.key === 'ArrowLeft') resolve(false);
+        };
+      });
       alive();
-      fast = reduceMotion;
-      for (const [k, v] of Object.entries(o.t)) scores[k] = (scores[k] || 0) + v;
-      await say('→ ' + o.r, 'reply');
-      await sleep(350);
+      if (report) { location.hash = `#/result/${winner}/${traits.join('-')}`; break; }
+      onKey = null;
+      undo(answers, block);
     }
-
-    document.getElementById('progress').style.width = '100%';
-    const { winner, traits } = evaluate(scores);
-    out.appendChild(document.createElement('br'));
-    for (const l of ['$ analyze --brutal', 'reading commit history... found "pls work" (x14)', 'counting tests... 0', 'measuring token usage... concerning', 'asking the AI about you... it sighed']) {
-      await say(l, l.startsWith('$') ? 'cmd' : 'dim');
-      await sleep(250);
-    }
-    await say(`match found: ${TYPES[winner].name} ${TYPES[winner].emoji}`, 'result');
-
-    const go = () => { location.hash = `#/result/${winner}/${traits.join('-')}`; };
-    const btn = document.createElement('button');
-    btn.className = 'open-report';
-    btn.textContent = '[enter] open full report →';
-    btn.addEventListener('click', go);
-    out.appendChild(btn);
-    scroll();
-    btn.focus({ preventScroll: true });
-    onKey = e => { if (e.key === 'Enter') go(); };
   } catch (e) {
     if (e !== 'cancelled') throw e;
   }
@@ -199,7 +234,7 @@ function typePage(id, you) {
     return `
       <div class="axis">
         <div class="axis-label"><b>${left ? v : 100 - v}%</b> ${left ? l : r}</div>
-        <div class="bar" style="--v:${v}%"><i></i></div>
+        <div class="bar${left ? '' : ' right'}" style="--v:${v}%"><i></i></div>
         <div class="axis-poles"><span class="${left ? 'on' : ''}">${l}</span><span class="${left ? '' : 'on'}">${r}</span></div>
       </div>`;
   }).join('');
