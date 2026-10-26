@@ -1,19 +1,19 @@
 # enxihong.github.io
 
-Personal portfolio + 6 browser games. Static site on GitHub Pages. Vanilla HTML/CSS/JS, no build tools, no dependencies.
+Personal site. The old portfolio with 6 browser games is archived in `v1/` (git tag `v1-archive`); the root is being rebuilt. Static site on GitHub Pages. Vanilla HTML/CSS/JS, no build tools, no dependencies.
 
-## File structure
+## File structure (v1/)
 
 ```
-index.html      HTML structure + <link>/<script> tags only (~110 lines)
-style.css       All CSS (~247 lines)
-js/main.js      Shared globals, screen switching, event wiring (~90 lines)
-js/snake.js     Snake game (~70 lines)
-js/tetris.js    Tetris game (~95 lines)
-js/fishy.js     Fishy game (~200 lines)
-js/breakout.js  Breakout game (~220 lines)
-js/draw.js      Draw tool (~130 lines)
-js/pacman.js    Pac-Man game (~320 lines)
+v1/index.html      HTML structure + <link>/<script> tags only (~110 lines)
+v1/style.css       All CSS (~247 lines)
+v1/js/main.js      Shared globals, screen switching, event wiring (~90 lines)
+v1/js/snake.js     Snake game (~70 lines)
+v1/js/tetris.js    Tetris game (~95 lines)
+v1/js/fishy.js     Fishy game (~200 lines)
+v1/js/breakout.js  Breakout game (~220 lines)
+v1/js/draw.js      Draw tool (~130 lines)
+v1/js/pacman.js    Pac-Man game (~320 lines)
 ```
 
 ## Globals defined in main.js

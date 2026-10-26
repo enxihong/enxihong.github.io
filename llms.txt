@@ -20,4 +20,5 @@ The site features a collection of browser-based games playable on desktop and mo
 ## Links
 
 - [Website](https://enxihong.github.io/)
+- [Archived v1 with games](https://enxihong.github.io/v1/)
 - [GitHub](https://github.com/enxihong)
