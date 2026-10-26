@@ -14,7 +14,7 @@ js/app.js         Hash router: #/ home, #/test terminal quiz, #/type/<id>, #/res
 
 Scoring: points per type are normalized by the max a type can reach; trait bars are the type profiles weighted by match strength. The emoji `.figure` on type pages is a placeholder for 3D figures.
 
-# Archive (v1/)
+## Archive (v1/)
 
 ### File structure (v1/)
 
