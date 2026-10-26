@@ -1,8 +1,22 @@
 # enxihong.github.io
 
-Personal site. The old portfolio with 6 browser games is archived in `v1/` (git tag `v1-archive`); the root is being rebuilt. Static site on GitHub Pages. Vanilla HTML/CSS/JS, no build tools, no dependencies.
+Personal site: "What kind of vibe coder are you?" personality test (English, roast tone, 16personalities-inspired look). The old portfolio with 6 browser games is archived in `v1/`. Static site on GitHub Pages. Vanilla HTML/CSS/JS, no build tools, no dependencies.
 
-## File structure (v1/)
+## File structure (root: vibe coder test)
+
+```
+index.html        Shell: fonts, <div id="app">, script tags
+style.css         All CSS (group colors: purple/yellow/green/coral)
+js/types.js       GROUPS, AXES, TYPES (15 types: copy, traits, enemy)
+js/questions.js   QUESTIONS (12; each option has points per type `t` and terminal reply `r`)
+js/app.js         Hash router: #/ home, #/test terminal quiz, #/type/<id>, #/result/<id>/<t1-t2-t3-t4>
+```
+
+Scoring: points per type are normalized by the max a type can reach; trait bars are the type profiles weighted by match strength. The emoji `.figure` on type pages is a placeholder for 3D figures.
+
+# Archive (v1/)
+
+### File structure (v1/)
 
 ```
 v1/index.html      HTML structure + <link>/<script> tags only (~110 lines)
@@ -16,7 +30,7 @@ v1/js/draw.js      Draw tool (~130 lines)
 v1/js/pacman.js    Pac-Man game (~320 lines)
 ```
 
-## Globals defined in main.js
+### Globals defined in main.js
 
 These are used by all game files:
 
@@ -31,7 +45,7 @@ These are used by all game files:
 - `resizeFishyCanvas()` — full-bleed canvas for Fishy
 - `calcCell(cols, rows)` — returns px per cell without resizing
 
-## Each game exports
+### Each game exports
 
 `{ init, start, stop, resize }` as a const (e.g. `const snake = (() => { ... })()`).
 
@@ -40,7 +54,7 @@ These are used by all game files:
 - `stop()` — called when user navigates back
 - `resize()` — called on window resize
 
-## Local storage keys
+### Local storage keys
 
 `snake-best`, `tetris-best`, `fishy-best`, `breakout-best`, `pacman-best`
 

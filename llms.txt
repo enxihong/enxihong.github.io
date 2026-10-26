@@ -6,9 +6,13 @@
 
 Enxi Hong's personal website at enxihong.github.io. Built entirely with HTML, CSS, and JavaScript. Hosted on GitHub Pages. Created with Claude Code from a phone while traveling.
 
-## Games
+## Vibe Coder Test
 
-The site features a collection of browser-based games playable on desktop and mobile:
+The homepage is "What kind of vibe coder are you?", a 12-question personality test with 15 roast-style types (e.g. The YOLO Shipper, The Prompt Poet, The Wish Coder, The Lazy One).
+
+## Games (archived in /v1/)
+
+The old site features a collection of browser-based games playable on desktop and mobile:
 
 - **Snake**: Classic snake game. Eat food to grow, avoid hitting yourself. Swipe controls on mobile.
 - **Tetris**: Block stacking game with ghost piece, scoring, and increasing speed per level.
